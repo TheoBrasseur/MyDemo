@@ -1,0 +1,24 @@
+INFORMATION: Trying to create context for all configs.
+INFORMATION: EGL context creation: EGL_KHR_create_context supported
+INFORMATION: Failed to create context for any configs. Tried 20 configs.
+INFORMATION: OpenGL ES 3.1 NOT supported. Trying lower version...
+INFORMATION: Trying to create context for all configs.
+INFORMATION: SUCCESS creating context! Reporting success. (Used config #0) .
+INFORMATION: Maximum API level detected: OpenGL ES 3.0
+INFORMATION: Unspecified target API -- Setting to max API level : OpenGL ES 3.0
+INFORMATION: EGL context creation: EGL_KHR_create_context supported...
+INFORMATION: Trying to get OpenGL ES version : 3.0
+INFORMATION: EGL context creation: EGL_IMG_context_priority not supported. Ignoring context Priority attribute.
+INFORMATION: EGL context creation: Number of EGL Configs found: 1
+INFORMATION: Creating EGL context...
+INFORMATION: EGL Initialized Successfully
+INFORMATION: === Final EGL Configuration ===
+INFORMATION: 	RedBits: 8
+INFORMATION: 	GreenBits: 8
+INFORMATION: 	BlueBits: 8
+INFORMATION: 	AlphaBits: 8
+INFORMATION: 	DepthBits: 24
+INFORMATION: 	StencilBits: 0
+INFORMATION: 	aaSamples: 0
+INFORMATION: 	FullScreen: false
+INFORMATION: ===============================
