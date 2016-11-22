@@ -172,6 +172,14 @@ bool MyDemo::configureGraphicsPipeline()
 	pipelineInfo.rasterizer.setCullFace(pvr::types::Face::Back);
 	pipelineInfo.depthStencil.setDepthTestEnable(true).setDepthCompareFunc(pvr::types::ComparisonMode::Less).setDepthWrite(true);
 
+  pvr::assets::VertexAttributeLayout vertexAttribLayout;
+  vertexAttribLayout.dataType = pvr::types::DataType::Float32;
+  vertexAttribLayout.offset = 0;
+  vertexAttribLayout.width = 3; 
+
+  pipelineInfo.vertexInput.addVertexAttribute(0, 0, vertexAttribLayout);
+  pipelineInfo.vertexInput.setInputBinding(0, 0, pvr::types::StepRate::Vertex);
+
   apiObject->graphicsPipeline = apiObject->context->createGraphicsPipeline(pipelineInfo);
 	
 	apiObject->commandBuffer->beginRecording();

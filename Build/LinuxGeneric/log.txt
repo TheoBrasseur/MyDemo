@@ -25,3 +25,4 @@ INFORMATION: ===============================
 ERROR: createShaderProgram begin 	 API error logged : GL_INVALID_ENUM
 INFORMATION: LUMINANCE/ALPHA format texture detected in OpenGL ES 3+ context. Remapping to RED texture with swizzling (r,r,r,g) enabled in order to allow Texture Storage.
 INFORMATION: ALPHA format texture detected in OpenGL ES 3+ context. Remapping to RED texture with swizzling (0,0,0,r) enabled in order to allow Texture Storage.
+INFORMATION: SystemEvent::Quit
