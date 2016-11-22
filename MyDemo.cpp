@@ -7,10 +7,8 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-pvr::float32 vertices[] = { -0.9f, 0.0f, 0.0f,      0.9f, 0.0f, 0.0f,      0.0f, 0.9f, 0.9f,};
+pvr::float32 vertices[] = { -0.9f, 0.0f, 0.0f,   0.0f, 0.0f,     0.9f, 0.0f, 0.0f,    1.0f, 0.0f,    0.0f, 0.9f, 0.9f,   0.5f, 0.5f };
 pvr::uint16 indices[] = { 0, 1, 2 };
-
-pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"}, {"UV0", "inTexCoord"} };
 
 class MyDemo : public pvr::Shell 
 {
@@ -172,12 +170,18 @@ bool MyDemo::configureGraphicsPipeline()
 	pipelineInfo.rasterizer.setCullFace(pvr::types::Face::Back);
 	pipelineInfo.depthStencil.setDepthTestEnable(true).setDepthCompareFunc(pvr::types::ComparisonMode::Less).setDepthWrite(true);
 
-  pvr::assets::VertexAttributeLayout vertexAttribLayout;
-  vertexAttribLayout.dataType = pvr::types::DataType::Float32;
-  vertexAttribLayout.offset = 0;
-  vertexAttribLayout.width = 3; 
+  pvr::assets::VertexAttributeLayout positionAttribLayout;
+  positionAttribLayout.dataType = pvr::types::DataType::Float32;
+  positionAttribLayout.offset = 0;
+  positionAttribLayout.width = 3; 
 
-  pipelineInfo.vertexInput.addVertexAttribute(0, 0, vertexAttribLayout);
+  pvr::assets::VertexAttributeLayout texCoordAttribLayout;
+  positionAttribLayout.dataType = pvr::types::DataType::Float32;
+  positionAttribLayout.offset = 3 * sizeof(pvr::float32);
+  positionAttribLayout.width = 2; 
+
+  pipelineInfo.vertexInput.addVertexAttribute(0, 0, positionAttribLayout);
+  pipelineInfo.vertexInput.addVertexAttribute(1, 0, texCoordAttribLayout);
   pipelineInfo.vertexInput.setInputBinding(0, 0, pvr::types::StepRate::Vertex);
 
   apiObject->graphicsPipeline = apiObject->context->createGraphicsPipeline(pipelineInfo);
