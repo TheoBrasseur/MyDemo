@@ -7,10 +7,10 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-pvr::float32 positions[] = { -0.9f, 0.0f, 0.0f,  0.9f, 0.0f, 0.0f,   0.0f, 0.9f, 0.9f  };
+pvr::float32 vertices[] = { -0.9f, 0.0f, 0.0f,      0.0f, 0.0f,         0.9f, 0.0f, 0.0f,   1.0f, 0.0f,       0.0f, 0.9f, 0.9f,     0.5f, 0.5f };
 pvr::uint16 indices[] = { 0, 1, 2 };
 
-pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"} };
+pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"}, {"UV0", "inTexCoord"} };
 
 class MyDemo : public pvr::Shell 
 {
@@ -57,7 +57,7 @@ bool MyDemo::configureCommandBuffer()
 	apiObject->commandBuffer->beginRenderPass(apiObject->fbo, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
 	apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
 	apiObject->commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
-	/* apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &identity); */
+	apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &identity);
 	drawMesh(0);
 	pvr::api::SecondaryCommandBuffer uiCmdBuffer = apiObject->context->createSecondaryCommandBufferOnDefaultPool();
 	uiRenderer.beginRendering(uiCmdBuffer);
@@ -73,7 +73,8 @@ bool MyDemo::configureCommandBuffer()
 
 pvr::Result MyDemo::drawMesh(int nodeIndex)
 {
-	/* pvr::uint32 meshId = modelHandle->getNode(nodeIndex).getObjectId(); */
+	modelHandle->initCache();
+	pvr::uint32 wID = modelHandle->getNode(nodeIndex).getObjectId();
   pvr::uint32 meshId = 0;
 	pvr::assets::Mesh& mesh = modelHandle->getMesh(meshId);
 
@@ -166,7 +167,7 @@ bool MyDemo::configureGraphicsPipeline()
 	
 	apiObject->commandBuffer->beginRecording();
   apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
-	/* apiObject->commandBuffer->setUniform<pvr::int32>(apiObject->graphicsPipeline->getUniformLocation("sTexture"), 0); */
+	apiObject->commandBuffer->setUniform<pvr::int32>(apiObject->graphicsPipeline->getUniformLocation("sTexture"), 0);
 	apiObject->commandBuffer->endRecording();
 	apiObject->commandBuffer->submit();
 	
@@ -179,20 +180,17 @@ pvr::Result MyDemo::initApplication()
   int numNode;
 
 	// Load model
-  modelHandle.reset(new pvr::assets::Model());
+  modelHandle.construct();
   modelHandle->allocNodes(1);
   modelHandle->allocMeshes(1);
   pvr::assets::Mesh& mesh = modelHandle->getMesh(0);
-  pvr::uint32 index = mesh.addData((pvr::byte *) positions, sizeof(positions), 0);
+  pvr::uint32 index = mesh.addData((pvr::byte *) vertices, sizeof(vertices), 0);
   mesh.addVertexAttribute("POSITION", pvr::types::DataType::Float32, 3, 0, index);
-  mesh.setPrimitiveType(pvr::types::PrimitiveTopology::TriangleList);
+  mesh.addVertexAttribute("UV0", pvr::types::DataType::Float32, 2, 3 * sizeof(pvr::float32), index);
   mesh.addFaces((pvr::byte *) indices, sizeof(indices), pvr::types::IndexType::IndexType16Bit);
-  mesh.setNumVertices(3);
   mesh.setPrimitiveType(pvr::types::PrimitiveTopology::TriangleList);
   const pvr::assets::Mesh::MeshInfo& meshInfo = mesh.getMeshInfo();
   pvr::Log(pvr::Log.Information, "num Vertices: %d num Faces: %d, index of Positon: %d", meshInfo.numVertices, meshInfo.numFaces, mesh.getVertexAttributeIndex("POSITION"));;
-
-  modelHandle->getNode(0).getUserDataSize();
 
 	return pvr::Result::Success;
 }
@@ -210,10 +208,10 @@ pvr::Result MyDemo::initView()
 		return pvr::Result::UnknownError;
 	}
 
-	/* if (createImageSamplerDescriptor() != pvr::Result::Success) */
-	/* { */
-	/* 	return pvr::Result::UnknownError; */
-	/* } */
+	if (createImageSamplerDescriptor() != pvr::Result::Success)
+	{
+		return pvr::Result::UnknownError;
+	}
 
   apiObject->fbo = apiObject->context->createOnScreenFbo(0);
 
