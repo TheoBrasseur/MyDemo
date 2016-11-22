@@ -1,13 +1,13 @@
 #include <PVRShell/PVRShell.h>
 #include <PVRApi/PVRApi.h>
 #include <PVRUIRenderer/PVRUIRenderer.h>
+#include <PVRApi/TextureUtils.h>
 
-const char * modelFilename = "teapot.pod";
 const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-pvr::float32 vertices[] = { -0.9f, 0.0f, 0.0f,      0.0f, 0.0f,         0.9f, 0.0f, 0.0f,   1.0f, 0.0f,       0.0f, 0.9f, 0.9f,     0.5f, 0.5f };
+pvr::float32 vertices[] = { -0.9f, 0.0f, 0.0f,      0.9f, 0.0f, 0.0f,      0.0f, 0.9f, 0.9f,};
 pvr::uint16 indices[] = { 0, 1, 2 };
 
 pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"}, {"UV0", "inTexCoord"} };
@@ -23,19 +23,17 @@ class MyDemo : public pvr::Shell
 		pvr::api::DescriptorSetLayout descSetLayout;
 		pvr::api::PipelineLayout pipelineLayout;
 		pvr::api::DescriptorSet descSet;
-		std::vector<pvr::api::Buffer> vbos;
-		std::vector<pvr::api::Buffer> ibos;
+		pvr::api::Buffer vbos;
+		pvr::api::Buffer ibos;
 	};
 
-  pvr::api::AssetStore assetStore;
-  pvr::assets::ModelHandle modelHandle;
 	std::auto_ptr<ApiObject> apiObject;
 	pvr::ui::UIRenderer uiRenderer;
 
-  pvr::Result createImageSamplerDescriptor();
+  bool loadGeometry(); 
+  bool  createImageSamplerDescriptor();
 	pvr::Result drawMesh(int nodeIndex);
 	bool configureGraphicsPipeline();
-
 	bool configureCommandBuffer();
 
 public:
@@ -45,6 +43,16 @@ public:
 	virtual pvr::Result renderFrame();
 	virtual pvr::Result releaseView();
 };
+
+bool MyDemo::loadGeometry() 
+{
+  apiObject->vbos = apiObject->context->createBuffer(sizeof(vertices), pvr::types::BufferBindingUse::VertexBuffer, false);
+  apiObject->ibos = apiObject->context->createBuffer(sizeof(indices), pvr::types::BufferBindingUse::IndexBuffer, false);
+  apiObject->vbos->update(vertices, 0, sizeof(vertices));
+  apiObject->ibos->update(indices, 0, sizeof(indices));
+  
+  return true;  
+}
 
 bool MyDemo::configureCommandBuffer()
 {
@@ -73,38 +81,49 @@ bool MyDemo::configureCommandBuffer()
 
 pvr::Result MyDemo::drawMesh(int nodeIndex)
 {
-	modelHandle->initCache();
-	pvr::uint32 wID = modelHandle->getNode(nodeIndex).getObjectId();
-  pvr::uint32 meshId = 0;
-	pvr::assets::Mesh& mesh = modelHandle->getMesh(meshId);
+	apiObject->commandBuffer->bindVertexBuffer(apiObject->vbos, 0, 0);
+  apiObject->commandBuffer->bindIndexBuffer(apiObject->ibos, 0, pvr::types::IndexType::IndexType16Bit);
 
-	apiObject->commandBuffer->bindVertexBuffer(apiObject->vbos[0], 0, 0);
-  apiObject->commandBuffer->bindIndexBuffer(apiObject->ibos[0], 0, mesh.getFaces().getDataType());
-
-	if (mesh.getNumStrips() != 0)
-	{
-		pvr::Log(pvr::Log.Error, "Model is not a triangle list");
-		return pvr::Result::InvalidData;
-	}
-	else
-	{
-		if (apiObject->ibos[meshId].isValid())
-		{
-			apiObject->commandBuffer->bindIndexBuffer(apiObject->ibos[0], 0, mesh.getFaces().getDataType());
-			apiObject->commandBuffer->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
-		}
-		else
-		{
-			apiObject->commandBuffer->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
-		}
-	}
+  if (apiObject->ibos.isValid())
+  {
+    apiObject->commandBuffer->drawIndexed(0, 3, 0, 0, 1);
+  }
+  else
+  {
+    apiObject->commandBuffer->drawArrays(0, 3, 0, 1);
+  }
 
 	return pvr::Result::Success;
 }
 
-pvr::Result MyDemo::createImageSamplerDescriptor()
+bool MyDemo::createImageSamplerDescriptor()
 {
-	pvr::api::TextureView textureV;
+	pvr::api::TextureView textureView;
+  pvr::assets::Texture texture;
+  pvr::assets::assetReaders::TextureReaderPVR textureReader;
+
+  if(!textureReader.newAssetStream(this->getAssetStream(textureFileName, true)))
+  {
+    pvr::Log(pvr::Log.Error, "Failed to create stream to texture file");
+    return false;
+  }
+  if(!textureReader.openAssetStream())
+  {
+    pvr::Log(pvr::Log.Error, "Failed to open texture stream");
+    return false;
+  }
+  if(!textureReader.readAsset(texture))
+  {
+    pvr::Log(pvr::Log.Error, "Failed to read stream into texture file");
+    return false;
+  }
+  textureReader.closeAssetStream();
+
+  if(pvr::utils::textureUpload(apiObject->context, texture, textureView) != pvr::Result::Success)
+  {
+    pvr::Log(pvr::Log.Error, "Failed to upload stream into texture file");
+    return false;
+  }
 
 	pvr::assets::SamplerCreateParam samplerInfo;
 
@@ -113,23 +132,16 @@ pvr::Result MyDemo::createImageSamplerDescriptor()
 
 	pvr::api::Sampler sampler = apiObject->context->createSampler(samplerInfo);
 
-	// Load texture
-  if(!assetStore.getTextureWithCaching(getGraphicsContext(), textureFileName, &textureV, NULL))
-  {
-    this->setExitMessage("Failed to load texture");
-    return pvr::Result::UnknownError;
-  }
-
 	pvr::api::DescriptorSetUpdate descSetUpdate;
-	descSetUpdate.setCombinedImageSampler(0, textureV, sampler);
+	descSetUpdate.setCombinedImageSampler(0, textureView, sampler);
 	apiObject->descSet = apiObject->context->createDescriptorSetOnDefaultPool(apiObject->descSetLayout);
 	if(!apiObject->descSet.isValid())
   {
-    return pvr::Result::UnknownError;
+    return false;
   }
 	apiObject->descSet->update(descSetUpdate);
 
-	return pvr::Result::Success;
+	return true;
 }
 
 bool MyDemo::configureGraphicsPipeline()
@@ -155,13 +167,10 @@ bool MyDemo::configureGraphicsPipeline()
 	shaderFile.populateValidVersions(fragShaderFile, *this);
 	pipelineInfo.fragmentShader = apiObject->context->createShader(*shaderFile.getBestStreamForApi(apiObject->context->getApiType()), pvr::types::ShaderType::FragmentShader);
 
-  pvr::assets::Mesh mesh = modelHandle->getMesh(0);
-	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());
-  pipelineInfo.inputAssembler.setPrimitiveTopology(pvr::types::PrimitiveTopology::TriangleList);
+	pipelineInfo.inputAssembler.setPrimitiveTopology(pvr::types::PrimitiveTopology::TriangleList);
   apiObject->pipelineLayout = apiObject->context->createPipelineLayout(pipelineLayoutInfo);
 	pipelineInfo.rasterizer.setCullFace(pvr::types::Face::Back);
 	pipelineInfo.depthStencil.setDepthTestEnable(true).setDepthCompareFunc(pvr::types::ComparisonMode::Less).setDepthWrite(true);
-	pvr::utils::createInputAssemblyFromMesh(mesh, vertexBinding_Names, sizeof(vertexBinding_Names) / sizeof(vertexBinding_Names[0]), pipelineInfo);
 
   apiObject->graphicsPipeline = apiObject->context->createGraphicsPipeline(pipelineInfo);
 	
@@ -176,22 +185,6 @@ bool MyDemo::configureGraphicsPipeline()
 
 pvr::Result MyDemo::initApplication()
 {
-  assetStore.init(*this);
-  int numNode;
-
-	// Load model
-  modelHandle.construct();
-  modelHandle->allocNodes(1);
-  modelHandle->allocMeshes(1);
-  pvr::assets::Mesh& mesh = modelHandle->getMesh(0);
-  pvr::uint32 index = mesh.addData((pvr::byte *) vertices, sizeof(vertices), 0);
-  mesh.addVertexAttribute("POSITION", pvr::types::DataType::Float32, 3, 0, index);
-  mesh.addVertexAttribute("UV0", pvr::types::DataType::Float32, 2, 3 * sizeof(pvr::float32), index);
-  mesh.addFaces((pvr::byte *) indices, sizeof(indices), pvr::types::IndexType::IndexType16Bit);
-  mesh.setPrimitiveType(pvr::types::PrimitiveTopology::TriangleList);
-  const pvr::assets::Mesh::MeshInfo& meshInfo = mesh.getMeshInfo();
-  pvr::Log(pvr::Log.Information, "num Vertices: %d num Faces: %d, index of Positon: %d", meshInfo.numVertices, meshInfo.numFaces, mesh.getVertexAttributeIndex("POSITION"));;
-
 	return pvr::Result::Success;
 }
 
@@ -201,14 +194,17 @@ pvr::Result MyDemo::initView()
 	apiObject->context = getGraphicsContext();
   apiObject->commandBuffer = apiObject->context->createCommandBufferOnDefaultPool();
 
-  pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos); 
+  if (!loadGeometry())
+  {
+    return pvr::Result::UnknownError;
+  }
 
 	if (!configureGraphicsPipeline())
 	{
 		return pvr::Result::UnknownError;
 	}
 
-	if (createImageSamplerDescriptor() != pvr::Result::Success)
+	if (!createImageSamplerDescriptor())
 	{
 		return pvr::Result::UnknownError;
 	}
@@ -232,8 +228,6 @@ pvr::Result MyDemo::releaseView()
 {
 	apiObject.reset();
 	uiRenderer.release();
-	modelHandle.reset();
-  assetStore.releaseAll();
 	return pvr::Result::Success;
 }
 

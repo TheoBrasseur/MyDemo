@@ -274,7 +274,8 @@
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRUIRenderer/UIRenderer.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRUIRenderer/Sprite.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/AxisAlignedBox.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/UnicodeConverter.h
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/UnicodeConverter.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/TextureUtils.h
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRShell/PVRShell.h:
 
@@ -823,3 +824,5 @@
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/AxisAlignedBox.h:
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/UnicodeConverter.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/TextureUtils.h:
