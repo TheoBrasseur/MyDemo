@@ -176,13 +176,13 @@ bool MyDemo::configureGraphicsPipeline()
   positionAttribLayout.width = 3; 
 
   pvr::assets::VertexAttributeLayout texCoordAttribLayout;
-  positionAttribLayout.dataType = pvr::types::DataType::Float32;
-  positionAttribLayout.offset = 3 * sizeof(pvr::float32);
-  positionAttribLayout.width = 2; 
+  texCoordAttribLayout.dataType = pvr::types::DataType::Float32;
+  texCoordAttribLayout.offset = 3 * sizeof(pvr::float32);
+  texCoordAttribLayout.width = 2; 
 
   pipelineInfo.vertexInput.addVertexAttribute(0, 0, positionAttribLayout);
   pipelineInfo.vertexInput.addVertexAttribute(1, 0, texCoordAttribLayout);
-  pipelineInfo.vertexInput.setInputBinding(0, 0, pvr::types::StepRate::Vertex);
+  pipelineInfo.vertexInput.setInputBinding(0, 5 * sizeof(pvr::float32), pvr::types::StepRate::Vertex);
 
   apiObject->graphicsPipeline = apiObject->context->createGraphicsPipeline(pipelineInfo);
 	
