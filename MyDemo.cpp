@@ -160,7 +160,6 @@ pvr::Result MyDemo::releaseView()
 {
   gl::DisableVertexAttribArray(0);
   gl::DisableVertexAttribArray(1);
-  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
   gl::BindVertexArray(0);
   gl::DeleteProgram(shaderProgram);
   gl::DeleteVertexArrays(1, &vao);
