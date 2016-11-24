@@ -1,6 +1,7 @@
 ../Linux_x86_64/DebugX11/BuildTemp/OGLES/MyDemo.d \
  ../Linux_x86_64/DebugX11/BuildTemp/OGLES/MyDemo.o: \
  ../../../OGLES/MyDemo.cpp \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRShell/PVRShellNoPVRApi.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRShell/PVRShell.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRShell/Shell.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRShell/CommandLine.h \
@@ -208,30 +209,29 @@
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/IPlatformContext.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/IAssetProvider.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/Rectangle.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/PVRApi.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/Api.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/GraphicsPipeline.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/PipelineLayout.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiIncludes.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/NativeObjectsGles.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/OpenGLESHeaders.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES3/gl31.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES3/gl3platform.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/KHR/khrplatform.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES2/gl2ext.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES2/gl2.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES2/gl2platform.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/OpenGLESBindings.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/LibraryLoaderGles.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ApiGles31.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ApiGles3.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ApiGles2.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/NativeLibrary.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ApiGlesExt.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ExtensionLoaderGles.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/PVRAssets.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Model.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/AssetIncludes.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/StringHash.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/Hash_.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/ReinterpretBits.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/StringFunctions.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/PipelineConfig.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Texture.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/PixelFormat.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Texture/TextureDefines.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/AssetIncludes.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/ComputePipeline.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/CommandBuffer.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/DescriptorSet.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Buffer.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Sampler.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Fbo.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/RenderPass.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Sync.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/PVRAssets.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Model.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Asset.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/AssetReader.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Model/Camera.h \
@@ -245,6 +245,8 @@
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Effect.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/FileIO/PFXParser.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Effect_2.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/PixelFormat.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Texture/TextureDefines.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/../External/pugixml/pugixml.hpp \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/../External/pugixml/pugiconfig.hpp \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/FileIO/TextureReaderPVR.h \
@@ -262,20 +264,10 @@
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/FileIO/FileDefinesXNB.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/FileIO/TextureReaderTGA.h \
  /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/FileIO/FileDefinesTGA.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/AssetStore.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/EffectApi.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/BufferStream.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/CommandPool.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/ApiErrors.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/AssetUtils.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/StructuredMemory.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRUIRenderer/PVRUIRenderer.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRUIRenderer/UIRenderer.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRUIRenderer/Sprite.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/AxisAlignedBox.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/UnicodeConverter.h \
- /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/TextureUtils.h
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/TextureUtils.h \
+ /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/ShaderUtils.h
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRShell/PVRShellNoPVRApi.h:
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRShell/PVRShell.h:
 
@@ -691,15 +683,43 @@
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/Rectangle.h:
 
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/PVRApi.h:
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/NativeObjectsGles.h:
 
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/Api.h:
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/OpenGLESHeaders.h:
 
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/GraphicsPipeline.h:
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES3/gl31.h:
 
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/PipelineLayout.h:
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES3/gl3platform.h:
 
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiIncludes.h:
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/KHR/khrplatform.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES2/gl2ext.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES2/gl2.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Builds/Include/GLES2/gl2platform.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/OpenGLESBindings.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/LibraryLoaderGles.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ApiGles31.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ApiGles3.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ApiGles2.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/NativeLibrary.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ApiGlesExt.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/OGLES/ExtensionLoaderGles.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/PVRAssets.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Model.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/AssetIncludes.h:
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/StringHash.h:
 
@@ -708,36 +728,6 @@
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/ReinterpretBits.h:
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/StringFunctions.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/PipelineConfig.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Texture.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/PixelFormat.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Texture/TextureDefines.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/AssetIncludes.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/ComputePipeline.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/CommandBuffer.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/DescriptorSet.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Buffer.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Sampler.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Fbo.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/RenderPass.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/Sync.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/PVRAssets.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Model.h:
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Asset.h:
 
@@ -764,6 +754,10 @@
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/FileIO/PFXParser.h:
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Effect_2.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/PixelFormat.h:
+
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/Texture/TextureDefines.h:
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/../External/pugixml/pugixml.hpp:
 
@@ -799,30 +793,6 @@
 
 /home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRAssets/FileIO/FileDefinesTGA.h:
 
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/AssetStore.h:
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/TextureUtils.h:
 
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/EffectApi.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/BufferStream.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/ApiObjects/CommandPool.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/ApiErrors.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/AssetUtils.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/StructuredMemory.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRUIRenderer/PVRUIRenderer.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRUIRenderer/UIRenderer.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRUIRenderer/Sprite.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/AxisAlignedBox.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRCore/UnicodeConverter.h:
-
-/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRApi/TextureUtils.h:
+/home/theo/Development/Imagination/PowerVR_Graphics/PowerVR_SDK/SDK_2016_R2/Framework/PVRNativeApi/ShaderUtils.h:
