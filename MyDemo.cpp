@@ -9,7 +9,7 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-GLfloat vertices[] = { -0.9f, 0.0f, 0.0f,   0.0f, 0.0f,     0.9f, 0.0f, 0.0f,    1.0f, 0.0f,    0.0f, 0.9f, 0.9f,   0.5f, 0.5f };
+GLfloat vertices[] = { -0.9f, 0.0f, 0.0f,   0.0f, 0.0f,     0.9f, 0.0f, 0.0f,    1.0f, 0.0f,    0.0f, 0.9f, 0.0f,   0.5f, 0.5f };
 
 class MyDemo : public pvr::Shell 
 {
@@ -102,17 +102,18 @@ pvr::Result MyDemo::initView()
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
   gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), NULL, GL_STREAM_DRAW);
   gl::BufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+  //
   gl::GenVertexArrays(1, &vao);
   gl::BindVertexArray(vao);
   gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * GL_FLOAT, 0);
   gl::VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * GL_FLOAT, (void *) (3 * sizeof(GL_FLOAT)));
+  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
+  gl::DeleteBuffers(1, &vbo);
   gl::EnableVertexAttribArray(0);
   gl::EnableVertexAttribArray(1);
-  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
   gl::BindVertexArray(0);
   gl::DisableVertexAttribArray(0);
   gl::DisableVertexAttribArray(1);
-  gl::DeleteBuffers(1, &vbo);
 
   pvr::assets::ShaderFile shaderfile;
   shaderfile.populateValidVersions(vertexShaderFile, *this);
@@ -143,17 +144,6 @@ pvr::Result MyDemo::initView()
 	return pvr::Result::Success;
 }
 
-pvr::Result MyDemo::releaseView()
-{
-  gl::DisableVertexAttribArray(0);
-  gl::DisableVertexAttribArray(1);
-  gl::BindVertexArray(0);
-  gl::DeleteProgram(shaderProgram);
-  gl::DeleteVertexArrays(1, &vao);
-  gl::DeleteTextures(1, &texture);
-	return pvr::Result::Success;
-}
-
 pvr::Result MyDemo::renderFrame()
 {
   gl::Clear(GL_COLOR_BUFFER_BIT);
@@ -162,7 +152,20 @@ pvr::Result MyDemo::renderFrame()
   gl::DrawArrays(GL_TRIANGLES, 0, 3);
   gl::UseProgram(0);
   gl::BindVertexArray(0);
+
 	return pvr::Result::Success;
+}
+
+pvr::Result MyDemo::releaseView()
+{
+  gl::DisableVertexAttribArray(0);
+  gl::DisableVertexAttribArray(1);
+  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
+  gl::BindVertexArray(0);
+  gl::DeleteProgram(shaderProgram);
+  gl::DeleteVertexArrays(1, &vao);
+  gl::DeleteTextures(1, &texture);
+  return pvr::Result::Success;
 }
 
 pvr::Result MyDemo::quitApplication()
