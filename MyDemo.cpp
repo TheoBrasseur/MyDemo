@@ -9,8 +9,7 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-/* pvr::float32 vertices[] = { -0.9f, 0.0f, 0.0f,   0.0f, 0.0f,     0.9f, 0.0f, 0.0f,    1.0f, 0.0f,    0.0f, 0.9f, 0.9f,   0.5f, 0.5f }; */
-pvr::float32 vertices[] = { -0.9f, 0.0f, 0.0f,     0.9f, 0.0f, 0.0f,   0.0f, 0.9f, 0.9f };
+pvr::float32 vertices[] = { -0.9f, 0.0f, 0.0f,   0.0f, 0.0f,     0.9f, 0.0f, 0.0f,    1.0f, 0.0f,    0.0f, 0.9f, 0.9f,   0.5f, 0.5f };
 
 class MyDemo : public pvr::Shell 
 {
@@ -99,10 +98,10 @@ pvr::Result MyDemo::initView()
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
   gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), NULL, GL_STREAM_DRAW);
   gl::BufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-  gl::VertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-  /* gl::VertexAttribPointer(1, 2, GL_FLOAT, false, 5 * GL_FLOAT, (void *) (3 * sizeof(GL_FLOAT))); */
+  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * GL_FLOAT, 0);
+  gl::VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * GL_FLOAT, (void *) (3 * sizeof(GL_FLOAT)));
   gl::EnableVertexAttribArray(0);
-  /* gl::EnableVertexAttribArray(1); */
+  gl::EnableVertexAttribArray(1);
   gl::BindBuffer(GL_ARRAY_BUFFER, 0);
   gl::BindVertexArray(0);
 
@@ -151,6 +150,7 @@ pvr::Result MyDemo::renderFrame()
 {
   gl::Clear(GL_COLOR_BUFFER_BIT);
   gl::BindVertexArray(vao);
+  gl::UseProgram(shaderProgram);
   gl::DrawArrays(GL_TRIANGLES, 0, 3);
   gl::BindVertexArray(0);
 	return pvr::Result::Success;
