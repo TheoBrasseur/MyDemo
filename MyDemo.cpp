@@ -9,17 +9,14 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-GLfloat vertices[] = { -0.9f, 0.0f, 0.0f,   0.0f, 0.0f,     0.9f, 0.0f, 0.0f,    1.0f, 0.0f,    0.0f, 0.9f, 0.0f,   0.5f, 0.5f };
+GLfloat vertices[] = { -0.9f, 0.0f, 0.0f,   0.9f, 0.0f, 0.0f,     0.0f, 0.9f, 0.0f  };
 
 class MyDemo : public pvr::Shell 
 {
   GLuint shaderProgram;
   pvr::native::HShader_ shaders[2];
   GLuint vbo;
-  pvr::GraphicsContext context;
-  GLuint texture;
 
-  bool loadTexture();
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
 
 public:
@@ -29,31 +26,6 @@ public:
 	virtual pvr::Result renderFrame();
 	virtual pvr::Result releaseView();
 };
-
-bool MyDemo::loadTexture()
-{
-  pvr::Result result;
-  pvr::assets::Texture texture;
-  pvr::assets::assetReaders::TextureReaderPVR textureReader;
-
-  if(textureReader.newAssetStream(this->getAssetStream(textureFileName)))
-  {
-    pvr::Log(pvr::Log.Error, "Texture file not found");
-    return false;
-  }
-  if(!textureReader.openAssetStream())
-  {
-    pvr::Log(pvr::Log.Error, "Failed to open texture stream");
-    return false;
-  }
-  if(!textureReader.readAsset(texture))
-  {
-    pvr::Log(pvr::Log.Error, "Failed to read texture stream");
-    return false;
-  }
-  textureReader.closeAssetStream();
-  return true;
-}
 
 bool MyDemo::createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram)
 {
@@ -95,7 +67,6 @@ pvr::Result MyDemo::initApplication()
 pvr::Result MyDemo::initView()
 {
   gl::initGl();
-  context = this->getGraphicsContext();
   gl::GenBuffers(1, &vbo);
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
   gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), NULL, GL_STREAM_DRAW);
@@ -103,8 +74,8 @@ pvr::Result MyDemo::initView()
   gl::BindBuffer(GL_ARRAY_BUFFER, 0);
 
   pvr::assets::ShaderFile shaderfile;
-  shaderfile.populateValidVersions(vertexShaderFile, *this);
 
+  shaderfile.populateValidVersions(vertexShaderFile, *this);
   if(!pvr::utils::loadShader(pvr::native::HContext_(), *shaderfile.getBestStreamForApi(pvr::Api::OpenGLES3), pvr::types::ShaderType::VertexShader, 0, 0, shaders[0]))
   {
     return pvr::Result::InvalidData;
@@ -126,22 +97,17 @@ pvr::Result MyDemo::initView()
   gl::Enable(GL_DEPTH_TEST);
   gl::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-  /* if(!loadTexture()) */
-
 	return pvr::Result::Success;
 }
 
 pvr::Result MyDemo::renderFrame()
 {
   gl::Clear(GL_COLOR_BUFFER_BIT);
-  gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
-  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * GL_FLOAT, 0);
-  gl::VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * GL_FLOAT, (void *) (3 * sizeof(GL_FLOAT)));
-  gl::EnableVertexAttribArray(0);
-  gl::EnableVertexAttribArray(1);
   gl::UseProgram(shaderProgram);
+  gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
+  gl::EnableVertexAttribArray(0);
+  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
   gl::DrawArrays(GL_TRIANGLES, 0, 3);
-  gl::UseProgram(0);
 
 	return pvr::Result::Success;
 }
@@ -149,9 +115,7 @@ pvr::Result MyDemo::renderFrame()
 pvr::Result MyDemo::releaseView()
 {
   gl::DisableVertexAttribArray(0);
-  gl::DisableVertexAttribArray(1);
   gl::DeleteProgram(shaderProgram);
-  gl::DeleteTextures(1, &texture);
   return pvr::Result::Success;
 }
 
