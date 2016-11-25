@@ -69,9 +69,7 @@ pvr::Result MyDemo::initView()
   gl::initGl();
   gl::GenBuffers(1, &vbo);
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
-  gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), NULL, GL_STREAM_DRAW);
-  gl::BufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
+  gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 
   pvr::assets::ShaderFile shaderfile;
 
@@ -102,10 +100,10 @@ pvr::Result MyDemo::initView()
 
 pvr::Result MyDemo::renderFrame()
 {
-  gl::Clear(GL_COLOR_BUFFER_BIT);
+  gl::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   gl::UseProgram(shaderProgram);
-  gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
   gl::EnableVertexAttribArray(0);
+  gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
   gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
   gl::DrawArrays(GL_TRIANGLES, 0, 3);
 
