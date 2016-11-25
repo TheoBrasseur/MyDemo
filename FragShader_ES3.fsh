@@ -4,7 +4,7 @@ uniform sampler2D sTexture;
 
 in highp vec2 texCoords;
 
-out mediump vec4 fragmentColor;
+layout (location = 0) out mediump vec4 fragmentColor;
 
 void main()
 {

@@ -15,8 +15,10 @@ class MyDemo : public pvr::Shell
 {
   GLuint shaderProgram;
   pvr::native::HShader_ shaders[2];
+  GLuint renderBuffer;
   GLuint vbo;
   GLuint vao;
+  GLuint fbo;
   GLuint texture;
 
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
@@ -71,8 +73,8 @@ bool MyDemo::loadTexture()
   gl::GenTextures(1, &texture);
   gl::ActiveTexture(GL_TEXTURE0);
   gl::BindTexture(GL_TEXTURE_2D, texture);
-  /* gl::TexStorage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height); */
-  /* gl::TexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_FLOAT, textureAsset.getDataPointer()); */
+  /* gl::TexStorage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 2, 2); */
+  /* gl::TexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 2, 2, GL_RGB, GL_FLOAT, data); */
   gl::TexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, data);
   gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -129,6 +131,49 @@ pvr::Result MyDemo::initView()
   gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), NULL, GL_STREAM_DRAW);
   gl::BufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
   //
+
+  gl::GenRenderbuffers(1, &renderBuffer);
+  gl::BindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+  
+  //Needs to be called before binding to FBO
+  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGB, getWidth(), getHeight());
+
+  //FBO creation
+  gl::GenFramebuffers(1, &fbo);
+  gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+  
+  /* gl::FramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); */
+  gl::FramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, renderBuffer);
+
+  GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+  gl::DrawBuffers(1, drawBuffers);
+
+  GLenum result = gl::CheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+  switch (result) {
+    case GL_FRAMEBUFFER_UNDEFINED:
+      pvr::Log(pvr::Log.Error, "framebuffer undefined");
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+      pvr::Log(pvr::Log.Error, "framebuffer incomplete attachment");
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+      pvr::Log(pvr::Log.Error, "framebuffer missing attachment");
+      break;
+    case GL_FRAMEBUFFER_UNSUPPORTED:
+      pvr::Log(pvr::Log.Error, "framebuffer unsupported");
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+      pvr::Log(pvr::Log.Error, "framebuffer incomplete dimensions");
+      break;
+    default:
+      break;
+  }
+  if(result != GL_FRAMEBUFFER_COMPLETE)
+  {
+    pvr::Log(pvr::Log.Error, "Framebuffer is not complete");
+    return pvr::Result::InvalidData;
+  }
+
   gl::GenVertexArrays(1, &vao);
   gl::BindVertexArray(vao);
   gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), 0);
