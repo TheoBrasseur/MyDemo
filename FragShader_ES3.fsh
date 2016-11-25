@@ -8,6 +8,5 @@ out mediump vec4 fragmentColor;
 
 void main()
 {
-  /* fragmentColor = texture(sTexture, texCoords); */	
-  fragmentColor = vec4(0.0, 0.0, 1.0, 1.0);	
+  fragmentColor = texture(sTexture, texCoords) * vec4(0.0, 0.0, 1.0, 1.0);	
 }
