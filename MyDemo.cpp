@@ -146,7 +146,7 @@ pvr::Result MyDemo::initView()
 
 pvr::Result MyDemo::renderFrame()
 {
-  gl::Clear(GL_COLOR_BUFFER_BIT);
+  gl::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   gl::UseProgram(shaderProgram);
   gl::BindVertexArray(vao);
   gl::DrawArrays(GL_TRIANGLES, 0, 3);
