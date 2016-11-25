@@ -16,6 +16,7 @@ class MyDemo : public pvr::Shell
   GLuint shaderProgram;
   pvr::native::HShader_ shaders[2];
   GLuint vbo;
+  GLuint vao;
 
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
 
@@ -71,6 +72,15 @@ pvr::Result MyDemo::initView()
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
   gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 
+  gl::GenVertexArrays(1, &vao);
+  gl::BindVertexArray(vao);
+  gl::EnableVertexAttribArray(0);
+  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
+  gl::BindVertexArray(0);
+  gl::DeleteBuffers(1, &vbo);
+  gl::DisableVertexAttribArray(0);
+
   pvr::assets::ShaderFile shaderfile;
 
   shaderfile.populateValidVersions(vertexShaderFile, *this);
@@ -102,17 +112,17 @@ pvr::Result MyDemo::renderFrame()
 {
   gl::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   gl::UseProgram(shaderProgram);
-  gl::EnableVertexAttribArray(0);
-  gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
-  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  gl::BindVertexArray(vao);
   gl::DrawArrays(GL_TRIANGLES, 0, 3);
+  gl::BindVertexArray(0);
+  gl::UseProgram(0);
 
 	return pvr::Result::Success;
 }
 
 pvr::Result MyDemo::releaseView()
 {
-  gl::DisableVertexAttribArray(0);
+  gl::DeleteVertexArrays(1, &vao);
   gl::DeleteProgram(shaderProgram);
   return pvr::Result::Success;
 }
