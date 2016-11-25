@@ -17,7 +17,6 @@ class MyDemo : public pvr::Shell
   pvr::native::HShader_ shaders[2];
   GLuint vbo;
   GLuint vao;
-  pvr::GraphicsContext context;
   GLuint texture;
 
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
@@ -70,7 +69,6 @@ pvr::Result MyDemo::initApplication()
 pvr::Result MyDemo::initView()
 {
   gl::initGl();
-  context = this->getGraphicsContext();
   // VBO attachments are not part of VAO state
   gl::GenBuffers(1, &vbo);
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
