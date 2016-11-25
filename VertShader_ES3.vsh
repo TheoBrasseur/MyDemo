@@ -9,4 +9,4 @@ void main()
 {
 	gl_Position =  inPositions;
   texCoords = inTexCoords;
-}         
+}

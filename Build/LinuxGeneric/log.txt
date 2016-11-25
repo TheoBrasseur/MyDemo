@@ -22,4 +22,4 @@ INFORMATION: 	StencilBits: 0
 INFORMATION: 	aaSamples: 0
 INFORMATION: 	FullScreen: false
 INFORMATION: ===============================
-INFORMATION: SystemEvent::Quit
+CRITICAL: ASSERTION FAILED: Dereferencing NULL pointer

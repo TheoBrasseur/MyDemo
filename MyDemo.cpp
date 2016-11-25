@@ -15,10 +15,12 @@ class MyDemo : public pvr::Shell
 {
   GLuint shaderProgram;
   pvr::native::HShader_ shaders[2];
+  pvr::native::HTexture_ texture;
   GLuint vbo;
   GLuint vao;
 
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
+  bool loadTexture();
 
 public:
 	virtual pvr::Result initApplication();
@@ -27,6 +29,45 @@ public:
 	virtual pvr::Result renderFrame();
 	virtual pvr::Result releaseView();
 };
+
+bool MyDemo::loadTexture()
+{
+  pvr::Result result;
+  pvr::assets::Texture textureAsset;
+  pvr::assets::assetReaders::TextureReaderPVR textureReader;
+
+  if(!textureReader.newAssetStream(this->getAssetStream(textureFileName)))
+  {
+    pvr::Log(pvr::Log.Error, "textureAsset file not found");
+    return false;
+  }
+  if(!textureReader.openAssetStream())
+  {
+    pvr::Log(pvr::Log.Error, "Failed to open textureAsset stream");
+    return false;
+  }
+  if(!textureReader.readAsset(textureAsset))
+  {
+    pvr::Log(pvr::Log.Error, "Failed to read textureAsset stream");
+    return false;
+  }
+  textureReader.closeAssetStream();
+
+  pvr::types::ImageAreaSize imageAreaSize;
+  bool isDecompressed;
+  pvr::PixelFormat pixelFormat;
+
+  pvr::utils::textureUpload(getGraphicsContext()->getPlatformContext(), textureAsset, texture, imageAreaSize, pixelFormat, isDecompressed, true);
+    
+  gl::ActiveTexture(GL_TEXTURE0);
+  gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  gl::Uniform1i(gl::GetUniformLocation(shaderProgram, "sTexture"), 0);
+
+  return true;
+}
 
 bool MyDemo::createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram)
 {
@@ -68,12 +109,16 @@ pvr::Result MyDemo::initApplication()
 pvr::Result MyDemo::initView()
 {
   gl::initGl();
+  // VBO attachments are not part of VAO state
   gl::GenBuffers(1, &vbo);
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
   gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 
   gl::GenVertexArrays(1, &vao);
   gl::BindVertexArray(vao);
+  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), 0);
+  gl::VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (void *) (3 * sizeof(GL_FLOAT)));
+  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
   gl::EnableVertexAttribArray(0);
   gl::EnableVertexAttribArray(1);
   gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), 0);
@@ -108,6 +153,11 @@ pvr::Result MyDemo::initView()
   gl::Enable(GL_DEPTH_TEST);
   gl::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+  if(!loadTexture())
+  {
+    return pvr::Result::InvalidData;
+  }
+
 	return pvr::Result::Success;
 }
 
@@ -125,8 +175,9 @@ pvr::Result MyDemo::renderFrame()
 
 pvr::Result MyDemo::releaseView()
 {
-  gl::DeleteVertexArrays(1, &vao);
   gl::DeleteProgram(shaderProgram);
+  gl::DeleteVertexArrays(1, &vao);
+  gl::DeleteTextures(1, &texture.handle);
   return pvr::Result::Success;
 }
 
