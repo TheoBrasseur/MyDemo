@@ -105,11 +105,11 @@ pvr::Result MyDemo::initView()
   //
   gl::GenVertexArrays(1, &vao);
   gl::BindVertexArray(vao);
+  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), 0);
+  gl::VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (void *) (3 * sizeof(GL_FLOAT)));
+  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
   gl::EnableVertexAttribArray(0);
   gl::EnableVertexAttribArray(1);
-  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * GL_FLOAT, 0);
-  gl::VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * GL_FLOAT, (void *) (3 * sizeof(GL_FLOAT)));
-  gl::BindBuffer(GL_ARRAY_BUFFER, 0);
   gl::BindVertexArray(0);
   gl::DeleteBuffers(1, &vbo);
   gl::DisableVertexAttribArray(0);
