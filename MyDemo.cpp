@@ -20,7 +20,6 @@ class MyDemo : public pvr::Shell
   pvr::GraphicsContext context;
   GLuint texture;
 
-  bool loadTexture();
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
 
 public:
@@ -30,31 +29,6 @@ public:
 	virtual pvr::Result renderFrame();
 	virtual pvr::Result releaseView();
 };
-
-bool MyDemo::loadTexture()
-{
-  pvr::Result result;
-  pvr::assets::Texture texture;
-  pvr::assets::assetReaders::TextureReaderPVR textureReader;
-
-  if(textureReader.newAssetStream(this->getAssetStream(textureFileName)))
-  {
-    pvr::Log(pvr::Log.Error, "Texture file not found");
-    return false;
-  }
-  if(!textureReader.openAssetStream())
-  {
-    pvr::Log(pvr::Log.Error, "Failed to open texture stream");
-    return false;
-  }
-  if(!textureReader.readAsset(texture))
-  {
-    pvr::Log(pvr::Log.Error, "Failed to read texture stream");
-    return false;
-  }
-  textureReader.closeAssetStream();
-  return true;
-}
 
 bool MyDemo::createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram)
 {
