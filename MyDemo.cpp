@@ -9,7 +9,7 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-GLfloat vertices[] = { -0.9f, 0.0f, 0.0f,   0.9f, 0.0f, 0.0f,     0.0f, 0.9f, 0.0f  };
+GLfloat vertices[] = { -0.9f, 0.0f, 0.0f,   0.0, 0.0,    0.9f, 0.0f, 0.0f,      1.0, 0.0,    0.0f, 0.9f, 0.0f,      0.5, 0.5  };
 
 class MyDemo : public pvr::Shell 
 {
@@ -75,11 +75,14 @@ pvr::Result MyDemo::initView()
   gl::GenVertexArrays(1, &vao);
   gl::BindVertexArray(vao);
   gl::EnableVertexAttribArray(0);
-  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  gl::EnableVertexAttribArray(1);
+  gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), 0);
+  gl::VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (void *)(3 * sizeof(GL_FLOAT)));
   gl::BindBuffer(GL_ARRAY_BUFFER, 0);
   gl::BindVertexArray(0);
   gl::DeleteBuffers(1, &vbo);
   gl::DisableVertexAttribArray(0);
+  gl::DisableVertexAttribArray(1);
 
   pvr::assets::ShaderFile shaderfile;
 
