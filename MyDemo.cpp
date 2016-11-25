@@ -15,9 +15,9 @@ class MyDemo : public pvr::Shell
 {
   GLuint shaderProgram;
   pvr::native::HShader_ shaders[2];
+  pvr::native::HTexture_ texture;
   GLuint vbo;
   GLuint vao;
-  GLuint texture;
 
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
   bool loadTexture();
@@ -53,27 +53,13 @@ bool MyDemo::loadTexture()
   }
   textureReader.closeAssetStream();
 
-  GLsizei width, height;
-  GLenum internalformat;
+  pvr::types::ImageAreaSize imageAreaSize;
+  bool isDecompressed;
+  pvr::PixelFormat pixelFormat;
 
-  width = textureAsset.getHeader().getWidth();
-  height = textureAsset.getHeader().getHeight();
-
-  /* pvr::uint8 numChannel = textureAsset.getHeader().getPixelFormat().getNumberOfChannels(); */
-  /* pvr::uint8 a = textureAsset.getHeader().getPixelFormat().getChannelBits(0); */
-  /* pvr::uint8 b = textureAsset.getHeader().getPixelFormat().getChannelBits(1); */
-  /* pvr::uint8 c = textureAsset.getHeader().getPixelFormat().getChannelBits(2); */
-  /* pvr::uint8 d = textureAsset.getHeader().getPixelFormat().getChannelBits(3); */
-
-  pvr::float32 data[] = { 0.0f, 0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  
-                          1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 0.0f };
-
-  gl::GenTextures(1, &texture);
+  pvr::utils::textureUpload(getGraphicsContext()->getPlatformContext(), textureAsset, texture, imageAreaSize, pixelFormat, isDecompressed, true);
+    
   gl::ActiveTexture(GL_TEXTURE0);
-  gl::BindTexture(GL_TEXTURE_2D, texture);
-  /* gl::TexStorage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height); */
-  /* gl::TexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_FLOAT, textureAsset.getDataPointer()); */
-  gl::TexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, data);
   gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -189,7 +175,7 @@ pvr::Result MyDemo::releaseView()
 {
   gl::DeleteProgram(shaderProgram);
   gl::DeleteVertexArrays(1, &vao);
-  gl::DeleteTextures(1, &texture);
+  gl::DeleteTextures(1, &texture.handle);
   return pvr::Result::Success;
 }
 
