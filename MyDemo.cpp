@@ -9,7 +9,7 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-GLfloat vertices[] = { -0.9f, 0.0f, 0.0f,   0.0, 0.0,    0.9f, 0.0f, 0.0f,      1.0, 0.0,    0.0f, 0.9f, 0.0f,      0.5, 0.5  };
+GLfloat vertices[] = { -0.9f, 0.0f, 0.0f,   0.0f, 0.0f,    0.9f, 0.0f, 0.0f,      1.0f, 0.0f,    0.0f, 0.9f, 0.0f,      0.5f, 0.5f  };
 
 class MyDemo : public pvr::Shell 
 {
