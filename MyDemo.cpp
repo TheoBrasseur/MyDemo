@@ -78,11 +78,16 @@ bool MyDemo::blit()
 {
   gl::BindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
   gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-  /* gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST); */
-  gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+  /* gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR); */
   if(gl::GetError() == GL_INVALID_OPERATION)
   {
     pvr::Log(pvr::Log.Error, "Invalid blit");
+    return false;
+  }
+  else if(gl::GetError() == GL_INVALID_FRAMEBUFFER_OPERATION)
+  {
+    pvr::Log(pvr::Log.Error, "One of the two framebuffer used for blitting is not framebuffer complete");
     return false;
   }
   return true;
@@ -116,12 +121,6 @@ bool MyDemo::loadTexture()
 
   width = textureAsset.getHeader().getWidth();
   height = textureAsset.getHeader().getHeight();
-
-  /* pvr::uint8 numChannel = textureAsset.getHeader().getPixelFormat().getNumberOfChannels(); */
-  /* pvr::uint8 a = textureAsset.getHeader().getPixelFormat().getChannelBits(0); */
-  /* pvr::uint8 b = textureAsset.getHeader().getPixelFormat().getChannelBits(1); */
-  /* pvr::uint8 c = textureAsset.getHeader().getPixelFormat().getChannelBits(2); */
-  /* pvr::uint8 d = textureAsset.getHeader().getPixelFormat().getChannelBits(3); */
 
   pvr::float32 data[] = { 0.0f, 0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  
                           1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 0.0f };
