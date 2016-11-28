@@ -15,7 +15,8 @@ class MyDemo : public pvr::Shell
 {
   GLuint shaderProgram;
   pvr::native::HShader_ shaders[2];
-  GLuint renderBuffer;
+  GLuint renderBufferDepth;
+  GLuint renderBufferColor;
   GLuint vbo;
   GLuint vao;
   GLuint fbo;
@@ -132,8 +133,12 @@ pvr::Result MyDemo::initView()
   gl::BufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
   //
 
-  gl::GenRenderbuffers(1, &renderBuffer);
-  gl::BindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+  gl::GenRenderbuffers(1, &renderBufferColor);
+  gl::BindRenderbuffer(GL_RENDERBUFFER, renderBufferDepth);
+  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGB32F, getWidth(), getHeight());
+
+  gl::GenRenderbuffers(1, &renderBufferDepth);
+  gl::BindRenderbuffer(GL_RENDERBUFFER, renderBufferDepth);
   
   //Needs to be called before binding to FBO
   /* gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGB32F, getWidth(), getHeight()); */
@@ -144,7 +149,8 @@ pvr::Result MyDemo::initView()
   gl::BindFramebuffer(GL_FRAMEBUFFER, fbo);
   
   /* gl::FramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); */
-  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer);
+  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBufferDepth);
+  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER, renderBufferColor);
   
   /* GLenum buf[] = {GL_BACK}; */
   /* gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); */
