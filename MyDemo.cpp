@@ -24,7 +24,8 @@ class MyDemo : public pvr::Shell
 
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
   bool loadTexture();
-  void blit();
+  bool blit();
+  bool checkCompleteness();
 
 public:
 	virtual pvr::Result initApplication();
@@ -34,11 +35,57 @@ public:
 	virtual pvr::Result releaseView();
 };
 
-void MyDemo::blit()
+bool MyDemo::checkCompleteness()
+{
+  GLenum result = gl::CheckFramebufferStatus(GL_FRAMEBUFFER);
+  pvr::string message;
+  bool isComplete = true;
+  switch (result) {
+    case GL_FRAMEBUFFER_COMPLETE:
+      message = "framebuffer is complete. Congrats!";
+      isComplete = true;
+      break;
+    case GL_FRAMEBUFFER_UNDEFINED:
+      message = "framebuffer undefined";
+      isComplete = false;
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+      message = "framebuffer incomplete attachment";
+      isComplete = false;
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+      message = "framebuffer missing attachment";
+      isComplete = false;
+      break;
+    case GL_FRAMEBUFFER_UNSUPPORTED:
+      message = "framebuffer unsupported";
+      isComplete = false;
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+      message = "framebuffer incomplete dimensions";
+      isComplete = false;
+      break;
+    default:
+      message = "Unhandled framebuffer case";
+      isComplete = false;
+      break;
+  }
+  pvr::Log(pvr::Log.Error, "%s", message.c_str());
+  return isComplete;
+}
+
+bool MyDemo::blit()
 {
   gl::BindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
   gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-  gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_LINEAR);
+  /* gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST); */
+  gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  if(gl::GetError() == GL_INVALID_OPERATION)
+  {
+    pvr::Log(pvr::Log.Error, "Invalid blit");
+    return false;
+  }
+  return true;
 }
 
 bool MyDemo::loadTexture()
@@ -134,6 +181,15 @@ pvr::Result MyDemo::initApplication()
 pvr::Result MyDemo::initView()
 {
   gl::initGl();
+
+  GLint param0, param1, param2;
+  gl::GetIntegerv(GL_DEPTH_BITS, &param0);
+  gl::GetIntegerv(GL_RED_BITS, &param1);
+  gl::GetIntegerv(GL_ALPHA_BITS, &param2);
+  pvr::Log(pvr::Log.Error, "Depth bits in default framebuffer: %d", param0);
+  pvr::Log(pvr::Log.Error, "Red bits in default framebuffer: %d", param1);
+  pvr::Log(pvr::Log.Error, "alpha bits in default framebuffer: %d", param2);
+
   // VBO bindings are not part of VAO state
   gl::GenBuffers(1, &vbo);
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -142,9 +198,9 @@ pvr::Result MyDemo::initView()
   //
 
   gl::GenRenderbuffers(1, &renderBufferColor);
-  gl::BindRenderbuffer(GL_RENDERBUFFER, renderBufferDepth);
+  gl::BindRenderbuffer(GL_RENDERBUFFER, renderBufferColor);
   //Needs to be called before binding to FBO
-  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGB32F, getWidth(), getHeight());
+  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, getWidth(), getHeight());
 
   gl::GenRenderbuffers(1, &renderBufferDepth);
   gl::BindRenderbuffer(GL_RENDERBUFFER, renderBufferDepth);
@@ -161,27 +217,7 @@ pvr::Result MyDemo::initView()
   GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
   gl::DrawBuffers(1, drawBuffers);
 
-  GLenum result = gl::CheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-  switch (result) {
-    case GL_FRAMEBUFFER_UNDEFINED:
-      pvr::Log(pvr::Log.Error, "framebuffer undefined");
-      break;
-    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-      pvr::Log(pvr::Log.Error, "framebuffer incomplete attachment");
-      break;
-    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-      pvr::Log(pvr::Log.Error, "framebuffer missing attachment");
-      break;
-    case GL_FRAMEBUFFER_UNSUPPORTED:
-      pvr::Log(pvr::Log.Error, "framebuffer unsupported");
-      break;
-    case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-      pvr::Log(pvr::Log.Error, "framebuffer incomplete dimensions");
-      break;
-    default:
-      break;
-  }
-  if(result != GL_FRAMEBUFFER_COMPLETE)
+  if(!checkCompleteness())
   {
     pvr::Log(pvr::Log.Error, "Framebuffer is not complete");
     return pvr::Result::InvalidData;
@@ -238,7 +274,11 @@ pvr::Result MyDemo::renderFrame()
   gl::BindVertexArray(vao);
   gl::DrawArrays(GL_TRIANGLES, 0, 3);
 
-  blit();
+  if(!blit())
+  {
+    return pvr::Result::InvalidArgument;
+  }
+
   gl::BindVertexArray(0);
   gl::UseProgram(0);
 
