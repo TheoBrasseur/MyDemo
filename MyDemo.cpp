@@ -136,14 +136,15 @@ pvr::Result MyDemo::initView()
   gl::BindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
   
   //Needs to be called before binding to FBO
-  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGB32F, getWidth(), getHeight());
+  /* gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGB32F, getWidth(), getHeight()); */
+  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, getWidth(), getHeight());
 
   //FBO creation
   gl::GenFramebuffers(1, &fbo);
   gl::BindFramebuffer(GL_FRAMEBUFFER, fbo);
   
   /* gl::FramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); */
-  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, renderBuffer);
+  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer);
   
   /* GLenum buf[] = {GL_BACK}; */
   /* gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); */
