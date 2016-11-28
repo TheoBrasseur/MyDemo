@@ -24,6 +24,7 @@ class MyDemo : public pvr::Shell
 
   bool createShaderProgram(pvr::native::HShader_ shaders[], pvr::uint32 count, GLuint& shaderProgram);
   bool loadTexture();
+  void blit();
 
 public:
 	virtual pvr::Result initApplication();
@@ -32,6 +33,13 @@ public:
 	virtual pvr::Result renderFrame();
 	virtual pvr::Result releaseView();
 };
+
+void MyDemo::blit()
+{
+  gl::BindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+  gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_LINEAR);
+}
 
 bool MyDemo::loadTexture()
 {
@@ -126,7 +134,7 @@ pvr::Result MyDemo::initApplication()
 pvr::Result MyDemo::initView()
 {
   gl::initGl();
-  // VBO attachments are not part of VAO state
+  // VBO bindings are not part of VAO state
   gl::GenBuffers(1, &vbo);
   gl::BindBuffer(GL_ARRAY_BUFFER, vbo);
   gl::BufferData(GL_ARRAY_BUFFER, sizeof(vertices), NULL, GL_STREAM_DRAW);
@@ -135,27 +143,21 @@ pvr::Result MyDemo::initView()
 
   gl::GenRenderbuffers(1, &renderBufferColor);
   gl::BindRenderbuffer(GL_RENDERBUFFER, renderBufferDepth);
+  //Needs to be called before binding to FBO
   gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGB32F, getWidth(), getHeight());
 
   gl::GenRenderbuffers(1, &renderBufferDepth);
   gl::BindRenderbuffer(GL_RENDERBUFFER, renderBufferDepth);
-  
   //Needs to be called before binding to FBO
-  /* gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGB32F, getWidth(), getHeight()); */
   gl::RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, getWidth(), getHeight());
 
   //FBO creation
   gl::GenFramebuffers(1, &fbo);
-  gl::BindFramebuffer(GL_FRAMEBUFFER, fbo);
+  gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
   
-  /* gl::FramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0); */
   gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBufferDepth);
   gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER, renderBufferColor);
   
-  /* GLenum buf[] = {GL_BACK}; */
-  /* gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); */
-  /* gl::DrawBuffers(1, buf); */
-
   GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
   gl::DrawBuffers(1, drawBuffers);
 
@@ -235,6 +237,8 @@ pvr::Result MyDemo::renderFrame()
   gl::UseProgram(shaderProgram);
   gl::BindVertexArray(vao);
   gl::DrawArrays(GL_TRIANGLES, 0, 3);
+
+  blit();
   gl::BindVertexArray(0);
   gl::UseProgram(0);
 
