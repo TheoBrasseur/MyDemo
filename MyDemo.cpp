@@ -76,20 +76,6 @@ bool MyDemo::checkCompleteness()
 
 bool MyDemo::blit()
 {
-  GLuint tmpfbo, tmpRenderBufferColor, tmpRenderBufferDepth;
-  gl::GenRenderbuffers(1, &tmpRenderBufferColor);
-  gl::BindRenderbuffer(GL_RENDERBUFFER, tmpRenderBufferColor);
-  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, getWidth(), getHeight());
-
-  gl::GenRenderbuffers(1, &tmpRenderBufferDepth);
-  gl::BindRenderbuffer(GL_RENDERBUFFER, tmpRenderBufferDepth);
-  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, getWidth(), getHeight());
-
-  gl::GenFramebuffers(1, &tmpfbo);
-  gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, tmpfbo);
-  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, tmpRenderBufferColor);
-  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, tmpRenderBufferDepth);
-
   GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0};
   gl::DrawBuffers(1, drawBuffers);
 
@@ -97,11 +83,11 @@ bool MyDemo::blit()
   gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
   GLenum error = gl::GetError();
-  if(error == GL_INVALID_OPERATION || error == GL_INVALID_FRAMEBUFFER_OPERATION)
-  {
-    pvr::Log(pvr::Log.Error, "Invalid blit");
-    return false;
-  }
+  /* if(error == GL_INVALID_OPERATION || error == GL_INVALID_FRAMEBUFFER_OPERATION) */
+  /* { */
+  /*   pvr::Log(pvr::Log.Error, "Invalid blit"); */
+  /*   return false; */
+  /* } */
   return true;
 }
 
