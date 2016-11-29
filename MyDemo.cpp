@@ -42,7 +42,7 @@ bool MyDemo::checkCompleteness()
   bool isComplete = true;
   switch (result) {
     case GL_FRAMEBUFFER_COMPLETE:
-      message = "framebuffer is complete. Congrats!";
+      message = "framebuffer is complete.";
       isComplete = true;
       break;
     case GL_FRAMEBUFFER_UNDEFINED:
@@ -76,6 +76,23 @@ bool MyDemo::checkCompleteness()
 
 bool MyDemo::blit()
 {
+  GLuint tmpfbo, tmpRenderBufferColor, tmpRenderBufferDepth;
+  gl::GenRenderbuffers(1, &tmpRenderBufferColor);
+  gl::BindRenderbuffer(GL_RENDERBUFFER, tmpRenderBufferColor);
+  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, getWidth(), getHeight());
+
+  gl::GenRenderbuffers(1, &tmpRenderBufferDepth);
+  gl::BindRenderbuffer(GL_RENDERBUFFER, tmpRenderBufferDepth);
+  gl::RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, getWidth(), getHeight());
+
+  gl::GenFramebuffers(1, &tmpfbo);
+  gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, tmpfbo);
+  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, tmpRenderBufferColor);
+  gl::FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, tmpRenderBufferDepth);
+
+  GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0};
+  gl::DrawBuffers(1, drawBuffers);
+
   gl::BindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
   gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
