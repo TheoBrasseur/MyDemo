@@ -23,7 +23,10 @@ class MyDemo : public pvr::Shell
 		std::vector<pvr::api::Buffer> vbos;
 		std::vector<pvr::api::Buffer> ibos;
 	};
-  glm::mat4 viewProj;
+  glm::mat4 modelMatrix;
+  glm::mat4 viewMatrix;
+  glm::mat4 projMatrix;
+  glm::mat4 mvp;
   pvr::api::AssetStore assetStore;
   pvr::assets::ModelHandle modelHandle;
 	std::auto_ptr<ApiObject> apiObject;
@@ -45,18 +48,11 @@ public:
 
 bool MyDemo::configureCommandBuffer()
 {
-	glm::mat4 modelMatrix =  glm::mat4(1, 0, 0, 0,
-                                      0, 1, 0, 0,
-                                      0, 0, 1, 0,
-                                      0, 0, 0, 1);
-
-  glm::mat4 modelViewProj = viewProj * modelMatrix;
-
 	apiObject->commandBuffer->beginRecording();
 	apiObject->commandBuffer->beginRenderPass(apiObject->fbo, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
 	apiObject->commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
-	apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &modelViewProj);
+	apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
 	drawMesh(0);
 	pvr::api::SecondaryCommandBuffer uiCmdBuffer = apiObject->context->createSecondaryCommandBufferOnDefaultPool();
 	uiRenderer.beginRendering(uiCmdBuffer);
@@ -209,14 +205,9 @@ pvr::Result MyDemo::initView()
     return pvr::Result::UnknownError;
   }
 
-  if(!configureCommandBuffer())
-  {
-    return pvr::Result::UnknownError;
-  }
   glm::vec3 from, to, up;
-  pvr::float32 fovy, near, far;
 
-  /* modelHandle->getCameraProperties(0, fovy, from, to, up, near, far); */
+  pvr::float32 fovy, near, far;
 
   far = 100.0f;
   near = 0.1f;
@@ -225,16 +216,21 @@ pvr::Result MyDemo::initView()
   up = glm::vec3(0.0f, 1.0f, 0.0f);
   fovy = glm::pi<pvr::float32>() / 2;
 
-  /* near = 0.1; */
-  /* far = 10.0; */
+  glm::mat4 modelMatrix =  glm::mat4(1, 0, 0, 0,
+                                      0, 1, 0, 0,
+                                      0, 0, 1, 0,
+                                      0, 0, 0, 1);
 
-  /* from = glm::vec3(0.0f, 0.0f, 0.5f); */
-  /* to = glm::vec3(0.0f, 0.0f, 0.0f); */
-  /* up = glm::vec3(0.0f, 1.0f, 0.0f); */
+  projMatrix = glm::perspectiveFov<pvr::float32>(fovy, this->getWidth(), this->getHeight(), near, far);
 
-  viewProj = glm::perspectiveFov<pvr::float32>(fovy, this->getWidth(), this->getHeight(), near, far);
+  viewMatrix = glm::lookAt(from, to, up);
 
-  viewProj = viewProj * glm::lookAt(from, to, up);
+  mvp = projMatrix * viewMatrix * modelMatrix; 
+
+  if(!configureCommandBuffer())
+  {
+    return pvr::Result::UnknownError;
+  }
 
 	return pvr::Result::Success;
 }
