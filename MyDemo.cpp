@@ -96,7 +96,8 @@ bool MyDemo::blit()
   gl::BindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
   gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-  if(gl::GetError() == (GL_INVALID_OPERATION | GL_INVALID_FRAMEBUFFER_OPERATION))
+  GLenum error = gl::GetError();
+  if(error == GL_INVALID_OPERATION || error == GL_INVALID_FRAMEBUFFER_OPERATION)
   {
     pvr::Log(pvr::Log.Error, "Invalid blit");
     return false;
