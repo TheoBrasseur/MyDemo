@@ -79,15 +79,9 @@ bool MyDemo::blit()
   gl::BindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
   gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-  /* gl::BlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR); */
-  if(gl::GetError() == GL_INVALID_OPERATION)
+  if(gl::GetError() == (GL_INVALID_OPERATION | GL_INVALID_FRAMEBUFFER_OPERATION))
   {
     pvr::Log(pvr::Log.Error, "Invalid blit");
-    return false;
-  }
-  else if(gl::GetError() == GL_INVALID_FRAMEBUFFER_OPERATION)
-  {
-    pvr::Log(pvr::Log.Error, "One of the two framebuffer used for blitting is not framebuffer complete");
     return false;
   }
   return true;
