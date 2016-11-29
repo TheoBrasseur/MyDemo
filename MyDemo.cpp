@@ -53,7 +53,7 @@ bool MyDemo::configureCommandBuffer()
   glm::mat4 modelViewProj = viewProj * modelMatrix;
 
 	apiObject->commandBuffer->beginRecording();
-	apiObject->commandBuffer->beginRenderPass(apiObject->fbo, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	apiObject->commandBuffer->beginRenderPass(apiObject->fbo, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
 	apiObject->commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
 	apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &modelViewProj);
@@ -218,13 +218,12 @@ pvr::Result MyDemo::initView()
 
   /* modelHandle->getCameraProperties(0, fovy, from, to, up, near, far); */
 
-  fovy = 0.785;
-  far = 1000;
-  near = 1;
-  from = glm::vec3(0.55761, 0, 151.462);
-  to = glm::vec3(0.55482, -0.0389, 150.453);
-  up = glm::vec3(0, 1, -0.03);
-  /* fovy = glm::pi<pvr::float32>() / 2; */
+  far = 100.0f;
+  near = 0.1f;
+  from = glm::vec3(1.0f, 0.0f, 0.0f);
+  to = glm::vec3(0.0f, 0.0f, 1.0f);
+  up = glm::vec3(0.0f, 1.0f, 0.0f);
+  fovy = glm::pi<pvr::float32>() / 2;
 
   /* near = 0.1; */
   /* far = 10.0; */
