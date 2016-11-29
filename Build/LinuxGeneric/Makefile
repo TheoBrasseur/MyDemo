@@ -1,4 +1,3 @@
-
 #
 # File			Makefile
 # Title			Example makefile
@@ -10,19 +9,20 @@
 
 SDKDIR  = ../../../../../..
 OUTNAME = MyDemo
-DEPENDS =  PVRCore PVRAssets PVREgl PVRNativeGles PVRShell
-LIBRARIES =  PVRShell PVRNativeGles PVREgl PVRAssets PVRCore
+DEPENDS =  PVRCore PVRAssets PVREgl PVRNativeGles PVRGles PVRShell PVRUIRenderer
+LIBRARIES =  PVRUIRenderer PVRShell PVRGles PVRNativeGles PVREgl PVRAssets PVRCore
 LIBPATHS =  ../../../../../../Framework/Bin/Linux_$(PLAT_SUFFIX)/$(DEBUG_RELEASE)$(WS)
 
 OBJECTS +=	\
-			OGLES/MyDemo.o
+           OGLES/MyDemo.o
 
 RESOURCES += \
-			 FragShader_ES3.fsh\
-			 VertShader_ES3.vsh\
+           FragShader_ES3.fsh\
+           VertShader_ES3.vsh\
 
 COMMON_RESOURCES += \
-					Marble.pvr\
+           Marble.pvr\
+           teapot.pod\
 
 
 include $(SDKDIR)/Builds/Linux/make_example.mak
