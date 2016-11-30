@@ -7,7 +7,7 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-pvr::float32 angleY = glm::pi<pvr::float32>()/16;
+pvr::float32 translateX = 0;
 pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"} };
 
 class MyDemo : public pvr::Shell 
@@ -247,8 +247,8 @@ pvr::Result MyDemo::releaseView()
 
 pvr::Result MyDemo::renderFrame()
 {
-  angleY = (glm::pi<pvr::float32>()/150) * 0.05f * this->getFrameTime();
-	modelMatrix = glm::rotate(angleY, glm::vec3(0.0f, 1.0f, 0.0f));
+  translateX = this->getWidth() / 200 * this->getFrameTime();
+	modelMatrix = glm::translate(glm::vec3(translateX, 0, 0));
 	mvp = mvp * modelMatrix;
 	apiObject->commandBuffer->submit();
 
