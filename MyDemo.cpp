@@ -210,17 +210,14 @@ pvr::Result MyDemo::initView()
 
   pvr::float32 fovy, near, far;
 
-  far = 100.0f;
-  near = 0.1f;
-  from = glm::vec3(7.0f, 2.0f, 0.0f);
-  to = glm::vec3(0.0f, 0.0f, 1.0f);
+  far = 8.0f;
+  near = 4.0f;
+  from = glm::vec3(0.0f, 0.0f, 7.0f);
+  to = glm::vec3(0.0f, 0.0f, -1.0f);
   up = glm::vec3(0.0f, 1.0f, 0.0f);
   fovy = glm::pi<pvr::float32>() / 2;
 
-  glm::mat4 modelMatrix =  glm::mat4(1, 0, 0, 0,
-                                      0, 1, 0, 0,
-                                      0, 0, 1, 0,
-                                      0, 0, 0, 1);
+  glm::mat4 modelMatrix =  glm::rotate(glm::pi<pvr::float32>() / 8, glm::vec3(1.0f, 0.0f, 0.0f));
 
   projMatrix = glm::perspectiveFov<pvr::float32>(fovy, this->getWidth(), this->getHeight(), near, far);
 
@@ -247,11 +244,12 @@ pvr::Result MyDemo::releaseView()
 
 pvr::Result MyDemo::renderFrame()
 {
-  translateX = this->getWidth() / 200 * this->getFrameTime();
-	modelMatrix = glm::translate(glm::vec3(translateX, 0, 0));
+  translateX = this->getWidth() / 1000.0f * this->getFrameTime() / 1000.0f; 
+  pvr::Log(pvr::Log.Information, "translateX: %f", translateX);
+	modelMatrix = glm::translate(glm::vec3(translateX, 0.0, 0.00));
 	mvp = mvp * modelMatrix;
 	apiObject->commandBuffer->submit();
-
+	
 	return pvr::Result::Success;
 }
 
