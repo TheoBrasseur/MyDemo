@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "95AD2181532893FDDF8DB83F53A012744D71C8E2",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "95AD2181532893FDDF8DB83F53A012744D71C8E2" : 9223372036854775807,
+    "7262955D9C90A8C47180EF56983882D3083F7D69" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B4E641DF-6005-4002-AFA1-E67DC81308F7",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "95AD2181532893FDDF8DB83F53A012744D71C8E2" : "PowerVR\/",
+    "7262955D9C90A8C47180EF56983882D3083F7D69" : "PowerVR\/ProcessedAssets\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "MyDemo",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "OGLES\/Build\/OSX\/MyDemo.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "http:\/\/gogs.olympenet.ovh\/theo\/processedassets",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "7262955D9C90A8C47180EF56983882D3083F7D69"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "http:\/\/gogs.olympenet.ovh\/theo\/PowerVR",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "95AD2181532893FDDF8DB83F53A012744D71C8E2"
+    }
+  ]
+}

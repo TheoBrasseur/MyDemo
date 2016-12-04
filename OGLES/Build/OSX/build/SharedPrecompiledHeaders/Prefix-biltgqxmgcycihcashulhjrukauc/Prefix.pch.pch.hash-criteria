@@ -1,0 +1,27 @@
+-x
+c++
+-arch
+x86_64
+-std=gnu++11
+-stdlib=libc++
+-fmodules
+-gmodules
+-fbuild-session-file=/var/folders/9_/bz5mrcqx4wb19f2b39gtsmg80000gn/C/org.llvm.clang/ModuleCache/Session.modulevalidation
+-fpascal-strings
+-Os
+-fno-common
+-isysroot
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk
+-fasm-blocks
+-mmacosx-version-min=10.9
+-g
+-fvisibility=hidden
+-fvisibility-inlines-hidden
+-I../../../../../../Builds/Include
+-I../../../../../../Framework
+-I/Users/Theo/Development/Imagination/PowerVR/SDK_2016_R2/Examples/Intermediate/PowerVR/OGLES/Build/OSX/build/Release/include
+-F/Users/Theo/Development/Imagination/PowerVR/SDK_2016_R2/Examples/Intermediate/PowerVR/OGLES/Build/OSX/build/Release
+x86_64-apple-darwin16.1.0
+"4.2.1 Compatible Apple LLVM 8.0.0 (clang-800.0.38)"
+SDK_PRODUCT_BUILD_VERSION=16A300
+16A300
