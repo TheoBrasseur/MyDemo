@@ -18,11 +18,11 @@ OBJECTS +=	\
 
 RESOURCES += \
            FragShader_ES3.fsh\
-           VertShader_ES3.vsh\
+           VertShader_ES3.vsh
 
 COMMON_RESOURCES += \
            Marble.pvr\
-           teapot.pod\
+           teapot.pod
 
 
 include $(SDKDIR)/Builds/Linux/make_example.mak
