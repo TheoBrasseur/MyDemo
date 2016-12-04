@@ -7,9 +7,7 @@ const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_ES3.vsh";
 const char * fragShaderFile = "FragShader_ES3.fsh";
 
-pvr::float32 positions[] = { -0.9f, 0.0f, 0.0f,  0.9f, 0.0f, 0.0f,   0.0f, 0.9f, 0.9f  };
-pvr::uint16 indices[] = { 0, 1, 2 };
-
+pvr::float32 translateX = 0;
 pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"} };
 
 class MyDemo : public pvr::Shell 
@@ -26,7 +24,10 @@ class MyDemo : public pvr::Shell
 		std::vector<pvr::api::Buffer> vbos;
 		std::vector<pvr::api::Buffer> ibos;
 	};
-
+  glm::mat4 modelMatrix;
+  glm::mat4 viewMatrix;
+  glm::mat4 projMatrix;
+  glm::mat4 mvp;
   pvr::api::AssetStore assetStore;
   pvr::assets::ModelHandle modelHandle;
 	std::auto_ptr<ApiObject> apiObject;
@@ -48,16 +49,11 @@ public:
 
 bool MyDemo::configureCommandBuffer()
 {
-	glm::mat4 identity =  glm::mat4(1, 0, 0, 0,
-                                  0, 1, 0, 0,
-                                  0, 0, 1, 0,
-                                  0, 0, 0, 1);
-
 	apiObject->commandBuffer->beginRecording();
-	apiObject->commandBuffer->beginRenderPass(apiObject->fbo, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
+	apiObject->commandBuffer->beginRenderPass(apiObject->fbo, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
 	apiObject->commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
-	/* apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &identity); */
+	apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
 	drawMesh(0);
 	pvr::api::SecondaryCommandBuffer uiCmdBuffer = apiObject->context->createSecondaryCommandBufferOnDefaultPool();
 	uiRenderer.beginRendering(uiCmdBuffer);
@@ -73,12 +69,11 @@ bool MyDemo::configureCommandBuffer()
 
 pvr::Result MyDemo::drawMesh(int nodeIndex)
 {
-	/* pvr::uint32 meshId = modelHandle->getNode(nodeIndex).getObjectId(); */
-  pvr::uint32 meshId = 0;
+	pvr::uint32 meshId = modelHandle->getNode(nodeIndex).getObjectId();
 	pvr::assets::Mesh& mesh = modelHandle->getMesh(meshId);
 
-	apiObject->commandBuffer->bindVertexBuffer(apiObject->vbos[0], 0, 0);
-  apiObject->commandBuffer->bindIndexBuffer(apiObject->ibos[0], 0, mesh.getFaces().getDataType());
+	apiObject->commandBuffer->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
+  apiObject->commandBuffer->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
 
 	if (mesh.getNumStrips() != 0)
 	{
@@ -89,7 +84,6 @@ pvr::Result MyDemo::drawMesh(int nodeIndex)
 	{
 		if (apiObject->ibos[meshId].isValid())
 		{
-			apiObject->commandBuffer->bindIndexBuffer(apiObject->ibos[0], 0, mesh.getFaces().getDataType());
 			apiObject->commandBuffer->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
 		}
 		else
@@ -179,21 +173,11 @@ pvr::Result MyDemo::initApplication()
   int numNode;
 
 	// Load model
-  modelHandle.reset(new pvr::assets::Model());
-  modelHandle->allocNodes(1);
-  modelHandle->allocMeshes(1);
-  pvr::assets::Mesh& mesh = modelHandle->getMesh(0);
-  pvr::uint32 index = mesh.addData((pvr::byte *) positions, sizeof(positions), 0);
-  mesh.addVertexAttribute("POSITION", pvr::types::DataType::Float32, 3, 0, index);
-  mesh.setPrimitiveType(pvr::types::PrimitiveTopology::TriangleList);
-  mesh.addFaces((pvr::byte *) indices, sizeof(indices), pvr::types::IndexType::IndexType16Bit);
-  mesh.setNumVertices(3);
-  mesh.setPrimitiveType(pvr::types::PrimitiveTopology::TriangleList);
-  const pvr::assets::Mesh::MeshInfo& meshInfo = mesh.getMeshInfo();
-  pvr::Log(pvr::Log.Information, "num Vertices: %d num Faces: %d, index of Positon: %d", meshInfo.numVertices, meshInfo.numFaces, mesh.getVertexAttributeIndex("POSITION"));;
-
-  modelHandle->getNode(0).getUserDataSize();
-
+	if(!assetStore.loadModel(modelFilename, modelHandle, false))
+  {
+    pvr::Log(pvr::Log.Error, "Failed to load model for file: %s", modelFilename);
+    return pvr::Result::NotFound;
+  }
 	return pvr::Result::Success;
 }
 
@@ -210,10 +194,10 @@ pvr::Result MyDemo::initView()
 		return pvr::Result::UnknownError;
 	}
 
-	/* if (createImageSamplerDescriptor() != pvr::Result::Success) */
-	/* { */
-	/* 	return pvr::Result::UnknownError; */
-	/* } */
+	if (createImageSamplerDescriptor() != pvr::Result::Success)
+	{
+		return pvr::Result::UnknownError;
+	}
 
   apiObject->fbo = apiObject->context->createOnScreenFbo(0);
 
@@ -221,6 +205,25 @@ pvr::Result MyDemo::initView()
   {
     return pvr::Result::UnknownError;
   }
+
+  glm::vec3 from, to, up;
+
+  pvr::float32 fovy, near, far;
+
+  far = 8.0f;
+  near = 4.0f;
+  from = glm::vec3(0.0f, 0.0f, 7.0f);
+  to = glm::vec3(0.0f, 0.0f, -1.0f);
+  up = glm::vec3(0.0f, 1.0f, 0.0f);
+  fovy = glm::pi<pvr::float32>() / 2;
+
+  glm::mat4 modelMatrix =  glm::rotate(glm::pi<pvr::float32>() / 8, glm::vec3(1.0f, 0.0f, 0.0f));
+
+  projMatrix = glm::perspectiveFov<pvr::float32>(fovy, this->getWidth(), this->getHeight(), near, far);
+
+  viewMatrix = glm::lookAt(from, to, up);
+
+  mvp = projMatrix * viewMatrix * modelMatrix; 
 
   if(!configureCommandBuffer())
   {
@@ -241,8 +244,12 @@ pvr::Result MyDemo::releaseView()
 
 pvr::Result MyDemo::renderFrame()
 {
+  translateX = this->getWidth() / 1000.0f * this->getFrameTime() / 1000.0f; 
+  pvr::Log(pvr::Log.Information, "translateX: %f", translateX);
+	modelMatrix = glm::translate(glm::vec3(translateX, 0.0, 0.00));
+	mvp = mvp * modelMatrix;
 	apiObject->commandBuffer->submit();
-
+	
 	return pvr::Result::Success;
 }
 

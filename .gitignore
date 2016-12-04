@@ -1,4 +1,5 @@
 *.o
-MyDemo
 log.txt
+*glsldevil
+!Build/LinuxGeneric/Makefile
 
