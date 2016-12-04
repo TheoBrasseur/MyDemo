@@ -1,6 +1,4 @@
 *.o
-Build/
 log.txt
 *glsldevil
-!Build/LinuxGeneric/Makefile
 
