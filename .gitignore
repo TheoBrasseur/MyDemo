@@ -1,9 +1,8 @@
 *.o
 log.txt
 *glsldevil
-OGLES/Build
+OGLES/Build/*
 !OGLES/Build/LinuxGeneric/Makefile
 !OGLES/Build/WindowsVC2010/MyDemo.vcxproj
 !OGLES/Build/WindowsVC2010/MyDemo.sln
 !OGLES/Build/WindowsVC2010/MyDemo.rc
-
