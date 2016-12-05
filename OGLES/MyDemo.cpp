@@ -16,11 +16,14 @@ class MyDemo : public pvr::Shell
 	{
 		pvr::api::GraphicsPipeline graphicsPipeline;
 		pvr::GraphicsContext context;
-		pvr::api::CommandBuffer commandBuffer;
-		pvr::api::Fbo fbo;
+		pvr::api::CommandBuffer commandBuffer0;
+    pvr::api::CommandBuffer commandBuffer1;
+		pvr::api::Fbo fbo0;
+    pvr::api::Fbo fbo1;
 		pvr::api::DescriptorSetLayout descSetLayout;
 		pvr::api::PipelineLayout pipelineLayout;
 		pvr::api::DescriptorSet descSet;
+    pvr::api::RenderPass renderpass;
 		std::vector<pvr::api::Buffer> vbos;
 		std::vector<pvr::api::Buffer> ibos;
 	};
@@ -33,7 +36,7 @@ class MyDemo : public pvr::Shell
 	std::auto_ptr<ApiObject> apiObject;
 	pvr::ui::UIRenderer uiRenderer;
 
-  pvr::Result createImageSamplerDescriptor();
+  pvr::Result createDescriptorSets();
 	pvr::Result drawMesh(int nodeIndex);
 	bool configureGraphicsPipeline();
 
@@ -49,20 +52,48 @@ public:
 
 bool MyDemo::configureCommandBuffer()
 {
-	apiObject->commandBuffer->beginRecording();
-	apiObject->commandBuffer->beginRenderPass(apiObject->fbo, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
-	apiObject->commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
-	apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
+  pvr::api::ImageDataFormat colorImageDataFormat;
+  pvr::api::ImageDataFormat depthImageDataFormat(pvr::PixelFormat::Depth24Stencil8);
+
+  pvr::api::RenderPassColorInfo renderPassColorInfo(colorImageDataFormat, pvr::types::LoadOp::Load, pvr::types::StoreOp::Store, 1);
+
+  pvr::api::RenderPassDepthStencilInfo depthStencilInfo(depthImageDataFormat, pvr::types::LoadOp::Load, pvr::types::StoreOp::Store, pvr::types::LoadOp::Load, pvr::types::StoreOp::Store, 1);
+
+  pvr::api::RenderPassCreateParam renderPassInfo;
+  renderPassInfo.setColorInfo(0, renderPassColorInfo);
+  renderPassInfo.setDepthStencilInfo(depthStencilInfo);
+
+  apiObject->renderpass = apiObject->context->createRenderPass(renderPassInfo);
+
+  pvr::api::TextureView colorTexture;
+  pvr::api::TextureView depthTexture;
+  pvr::api::FboCreateParam fboInfo;
+
+  fboInfo.setColor(0, colorTexture);
+  fboInfo.setDepthStencil(depthTexture);
+
+  apiObject->fbo0 = apiObject->context->createFbo(fboInfo);
+  
+  apiObject->commandBuffer0->beginRecording();
+  apiObject->commandBuffer0->beginRenderPass(apiObject->fbo0, apiObject->renderpass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+  apiObject->commandBuffer0->bindPipeline(apiObject->graphicsPipeline);
+  apiObject->commandBuffer0->endRenderPass();
+  apiObject->commandBuffer0->endRecording();
+
+	apiObject->commandBuffer1->beginRecording();
+	apiObject->commandBuffer1->beginRenderPass(apiObject->fbo0, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	apiObject->commandBuffer1->bindPipeline(apiObject->graphicsPipeline);
+	apiObject->commandBuffer1->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
+	apiObject->commandBuffer1->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
 	drawMesh(0);
 	pvr::api::SecondaryCommandBuffer uiCmdBuffer = apiObject->context->createSecondaryCommandBufferOnDefaultPool();
 	uiRenderer.beginRendering(uiCmdBuffer);
 	uiRenderer.getDefaultTitle()->render();
 	uiRenderer.getSdkLogo()->render();
-	apiObject->commandBuffer->enqueueSecondaryCmds(uiCmdBuffer);
+	apiObject->commandBuffer1->enqueueSecondaryCmds(uiCmdBuffer);
 	uiRenderer.endRendering();
-	apiObject->commandBuffer->endRenderPass();
-	apiObject->commandBuffer->endRecording();
+	apiObject->commandBuffer1->endRenderPass();
+	apiObject->commandBuffer1->endRecording();
 
 	return true;
 }
@@ -72,8 +103,8 @@ pvr::Result MyDemo::drawMesh(int nodeIndex)
 	pvr::uint32 meshId = modelHandle->getNode(nodeIndex).getObjectId();
 	pvr::assets::Mesh& mesh = modelHandle->getMesh(meshId);
 
-	apiObject->commandBuffer->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
-  apiObject->commandBuffer->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
+	apiObject->commandBuffer0->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
+  apiObject->commandBuffer0->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
 
 	if (mesh.getNumStrips() != 0)
 	{
@@ -84,37 +115,42 @@ pvr::Result MyDemo::drawMesh(int nodeIndex)
 	{
 		if (apiObject->ibos[meshId].isValid())
 		{
-			apiObject->commandBuffer->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
+			apiObject->commandBuffer0->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
 		}
 		else
 		{
-			apiObject->commandBuffer->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
+			apiObject->commandBuffer0->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
 		}
 	}
 
 	return pvr::Result::Success;
 }
 
-pvr::Result MyDemo::createImageSamplerDescriptor()
+pvr::Result MyDemo::createDescriptorSets()
 {
-	pvr::api::TextureView textureV;
+  pvr::api::TextureStore colorTextureStore;
+  pvr::api::TextureStore depthTextureStore;
+  pvr::api::ImageStorageFormat colorImageStorageFormat; 
+  pvr::api::ImageStorageFormat depthImageStorageFormat; 
+
+  colorTextureStore->allocate2D(colorImageStorageFormat, getWidth(), getHeight(), pvr::types::ImageUsageFlags::ColorAttachment, pvr::types::ImageLayout::ColorAttachmentOptimal);
+  depthTextureStore->allocate2D(depthImageStorageFormat, getWidth(), getHeight(), pvr::types::ImageUsageFlags::DepthStencilAttachment, pvr::types::ImageLayout::DepthStencilAttachmentOptimal);
+
+  pvr::api::TextureView colorTextureView;
+  pvr::api::TextureView depthTextureView;
 
 	pvr::assets::SamplerCreateParam samplerInfo;
 
 	samplerInfo.magnificationFilter = pvr::types::SamplerFilter::Linear;
 	samplerInfo.minificationFilter = pvr::types::SamplerFilter::Linear;
+	pvr::api::Sampler samplerColor = apiObject->context->createSampler(samplerInfo);
 
-	pvr::api::Sampler sampler = apiObject->context->createSampler(samplerInfo);
-
-	// Load texture
-  if(!assetStore.getTextureWithCaching(getGraphicsContext(), textureFileName, &textureV, NULL))
-  {
-    this->setExitMessage("Failed to load texture");
-    return pvr::Result::UnknownError;
-  }
+  samplerInfo.magnificationFilter = pvr::types::SamplerFilter::Nearest;
+  samplerInfo.minificationFilter = pvr::types::SamplerFilter::Nearest;
+  pvr::api::Sampler samplerDepth = apiObject->context->createSampler(samplerInfo);
 
 	pvr::api::DescriptorSetUpdate descSetUpdate;
-	descSetUpdate.setCombinedImageSampler(0, textureV, sampler);
+	descSetUpdate.setCombinedImageSampler(0, colorTextureView, samplerColor).setCombinedImageSampler(1, depthTextureView, samplerDepth);
 	apiObject->descSet = apiObject->context->createDescriptorSetOnDefaultPool(apiObject->descSetLayout);
 	if(!apiObject->descSet.isValid())
   {
@@ -185,7 +221,7 @@ pvr::Result MyDemo::initView()
 {
 	apiObject.reset(new ApiObject());
 	apiObject->context = getGraphicsContext();
-  apiObject->commandBuffer = apiObject->context->createCommandBufferOnDefaultPool();
+  apiObject->commandBuffer0 = apiObject->context->createCommandBufferOnDefaultPool();
 
   pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos); 
 
@@ -194,14 +230,14 @@ pvr::Result MyDemo::initView()
 		return pvr::Result::UnknownError;
 	}
 
-	if (createImageSamplerDescriptor() != pvr::Result::Success)
+	if (createDescriptorSets() != pvr::Result::Success)
 	{
 		return pvr::Result::UnknownError;
 	}
 
-  apiObject->fbo = apiObject->context->createOnScreenFbo(0);
+  apiObject->fbo0 = apiObject->context->createOnScreenFbo(0);
 
-  if (uiRenderer.init(apiObject->fbo->getRenderPass(), 0) != pvr::Result::Success)
+  if (uiRenderer.init(apiObject->fbo0->getRenderPass(), 0) != pvr::Result::Success)
   {
     return pvr::Result::UnknownError;
   }
@@ -248,7 +284,7 @@ pvr::Result MyDemo::renderFrame()
   pvr::Log(pvr::Log.Information, "translateX: %f", translateX);
 	modelMatrix = glm::translate(glm::vec3(translateX, 0.0, 0.00));
 	mvp = mvp * modelMatrix;
-	apiObject->commandBuffer->submit();
+	apiObject->commandBuffer0->submit();
 	
 	return pvr::Result::Success;
 }
