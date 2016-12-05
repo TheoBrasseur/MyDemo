@@ -1,6 +1,12 @@
 *.o
-MyDemo
 log.txt
-Build/Linux_x86_64/
-*glsldevil*
-
+*glsldevil
+OGLES/Build/*
+!OGLES/Build/LinuxGeneric/
+!OGLES/Build/WindowsVC2010/
+OGLES/Build/LinuxGeneric/*
+OGLES/Build/WindowsVC2010/*
+!OGLES/Build/LinuxGeneric/Makefile
+!OGLES/Build/WindowsVC2010/MyDemo.vcxproj
+!OGLES/Build/WindowsVC2010/MyDemo.sln
+!OGLES/Build/WindowsVC2010/MyDemo.rc
