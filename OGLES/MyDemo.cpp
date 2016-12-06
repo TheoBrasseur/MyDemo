@@ -23,6 +23,8 @@ class MyDemo : public pvr::Shell
 		pvr::api::DescriptorSet descSet;
 		std::vector<pvr::api::Buffer> vbos;
 		std::vector<pvr::api::Buffer> ibos;
+    pvr::api::TextureView colorTextureView;
+    pvr::api::TextureView depthTextureView;
 	};
   glm::mat4 modelMatrix;
   glm::mat4 viewMatrix;
@@ -33,7 +35,7 @@ class MyDemo : public pvr::Shell
 	std::auto_ptr<ApiObject> apiObject;
 	pvr::ui::UIRenderer uiRenderer;
 
-  pvr::Result createImageSamplerDescriptor();
+  pvr::Result createDescriptorSet();
 	pvr::Result drawMesh(int nodeIndex);
 	bool configureGraphicsPipeline();
 
@@ -95,26 +97,38 @@ pvr::Result MyDemo::drawMesh(int nodeIndex)
 	return pvr::Result::Success;
 }
 
-pvr::Result MyDemo::createImageSamplerDescriptor()
+pvr::Result MyDemo::createDescriptorSet()
 {
-	pvr::api::TextureView textureV;
+  pvr::api::TextureStore colorTextureStore;
+  pvr::api::TextureStore depthTextureStore;
 
-	pvr::assets::SamplerCreateParam samplerInfo;
+	pvr::assets::SamplerCreateParam samplerInfoColor;
+  pvr::assets::SamplerCreateParam samplerInfoDepth;
 
-	samplerInfo.magnificationFilter = pvr::types::SamplerFilter::Linear;
-	samplerInfo.minificationFilter = pvr::types::SamplerFilter::Linear;
+	samplerInfoColor.magnificationFilter = pvr::types::SamplerFilter::Linear;
+	samplerInfoColor.minificationFilter = pvr::types::SamplerFilter::Linear;
 
-	pvr::api::Sampler sampler = apiObject->context->createSampler(samplerInfo);
+  samplerInfoDepth.magnificationFilter = pvr::types::SamplerFilter::Nearest;
+  samplerInfoDepth.minificationFilter = pvr::types::SamplerFilter::Nearest;
 
-	// Load texture
-  if(!assetStore.getTextureWithCaching(getGraphicsContext(), textureFileName, &textureV, NULL))
-  {
-    this->setExitMessage("Failed to load texture");
-    return pvr::Result::UnknownError;
-  }
+	pvr::api::Sampler samplerColor = apiObject->context->createSampler(samplerInfoColor);
+  pvr::api::Sampler samplerDepth = apiObject->context->createSampler(samplerInfoDepth);
+
+  pvr::api::ImageStorageFormat colorImageStorageFormat;
+  pvr::api::ImageStorageFormat depthImageStorageFormat;
+
+  colorTextureStore = apiObject->context->createTexture();
+  depthTextureStore = apiObject->context->createTexture();
+
+  colorTextureStore->allocate2D(colorImageStorageFormat, getWidth(), getHeight(), pvr::types::ImageUsageFlags::ColorAttachment, pvr::types::ImageLayout::ColorAttachmentOptimal);
+  depthTextureStore->allocate2D(depthImageStorageFormat, getWidth(), getHeight(), pvr::types::ImageUsageFlags::DepthStencilAttachment, pvr::types::ImageLayout::DepthStencilAttachmentOptimal);
+
+	apiObject->colorTextureView = apiObject->context->createTextureView(colorTextureStore);
+  apiObject->depthTextureView = apiObject->context->createTextureView(depthTextureStore);
 
 	pvr::api::DescriptorSetUpdate descSetUpdate;
-	descSetUpdate.setCombinedImageSampler(0, textureV, sampler);
+	descSetUpdate.setCombinedImageSampler(0, apiObject->colorTextureView, samplerColor);
+  descSetUpdate.setCombinedImageSampler(1, apiObject->depthTextureView, samplerDepth);
 	apiObject->descSet = apiObject->context->createDescriptorSetOnDefaultPool(apiObject->descSetLayout);
 	if(!apiObject->descSet.isValid())
   {
@@ -134,7 +148,9 @@ bool MyDemo::configureGraphicsPipeline()
 	pvr::assets::ShaderFile shaderFile;
 
   pvr::api::DescriptorSetLayoutCreateParam descSetLayoutInfo;
-  descSetLayoutInfo.setBinding(0, pvr::types::DescriptorType::CombinedImageSampler, 1, pvr::types::ShaderStageFlags::Fragment);
+  descSetLayoutInfo.setBinding(0, pvr::types::DescriptorType::StorageImage, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
+  descSetLayoutInfo.setBinding(1, pvr::types::DescriptorType::StorageImage, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
+    
   apiObject->descSetLayout = apiObject->context->createDescriptorSetLayout(descSetLayoutInfo);
 
   pipelineInfo.colorBlend.setAttachmentState(0, colorBlendState);
@@ -147,6 +163,7 @@ bool MyDemo::configureGraphicsPipeline()
 
 	shaderFile.populateValidVersions(fragShaderFile, *this);
 	pipelineInfo.fragmentShader = apiObject->context->createShader(*shaderFile.getBestStreamForApi(apiObject->context->getApiType()), pvr::types::ShaderType::FragmentShader);
+
 
   pvr::assets::Mesh mesh = modelHandle->getMesh(0);
 	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());
@@ -194,7 +211,7 @@ pvr::Result MyDemo::initView()
 		return pvr::Result::UnknownError;
 	}
 
-	if (createImageSamplerDescriptor() != pvr::Result::Success)
+	if (createDescriptorSet() != pvr::Result::Success)
 	{
 		return pvr::Result::UnknownError;
 	}
