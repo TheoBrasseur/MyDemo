@@ -23,8 +23,6 @@ class MyDemo : public pvr::Shell
 		pvr::api::DescriptorSet descSet;
 		std::vector<pvr::api::Buffer> vbos;
 		std::vector<pvr::api::Buffer> ibos;
-    pvr::api::TextureView colorTextureView;
-    pvr::api::TextureView depthTextureView;
 	};
   glm::mat4 modelMatrix;
   glm::mat4 viewMatrix;
@@ -37,8 +35,8 @@ class MyDemo : public pvr::Shell
 
   pvr::Result createDescriptorSet();
 	pvr::Result drawMesh(int nodeIndex);
+  bool createFbo();
 	bool configureGraphicsPipeline();
-
 	bool configureCommandBuffer();
 
 public:
@@ -99,20 +97,21 @@ pvr::Result MyDemo::drawMesh(int nodeIndex)
 
 pvr::Result MyDemo::createDescriptorSet()
 {
+	pvr::api::DescriptorSetUpdate descSetUpdate;
+	apiObject->descSet = apiObject->context->createDescriptorSetOnDefaultPool(apiObject->descSetLayout);
+	if(!apiObject->descSet.isValid())
+  {
+    return pvr::Result::UnknownError;
+  }
+	apiObject->descSet->update(descSetUpdate);
+
+	return pvr::Result::Success;
+}
+
+bool MyDemo::createFbo()
+{
   pvr::api::TextureStore colorTextureStore;
   pvr::api::TextureStore depthTextureStore;
-
-	pvr::assets::SamplerCreateParam samplerInfoColor;
-  pvr::assets::SamplerCreateParam samplerInfoDepth;
-
-	samplerInfoColor.magnificationFilter = pvr::types::SamplerFilter::Linear;
-	samplerInfoColor.minificationFilter = pvr::types::SamplerFilter::Linear;
-
-  samplerInfoDepth.magnificationFilter = pvr::types::SamplerFilter::Nearest;
-  samplerInfoDepth.minificationFilter = pvr::types::SamplerFilter::Nearest;
-
-	pvr::api::Sampler samplerColor = apiObject->context->createSampler(samplerInfoColor);
-  pvr::api::Sampler samplerDepth = apiObject->context->createSampler(samplerInfoDepth);
 
   pvr::api::ImageStorageFormat colorImageStorageFormat;
   pvr::api::ImageStorageFormat depthImageStorageFormat;
@@ -123,20 +122,25 @@ pvr::Result MyDemo::createDescriptorSet()
   colorTextureStore->allocate2D(colorImageStorageFormat, getWidth(), getHeight(), pvr::types::ImageUsageFlags::ColorAttachment, pvr::types::ImageLayout::ColorAttachmentOptimal);
   depthTextureStore->allocate2D(depthImageStorageFormat, getWidth(), getHeight(), pvr::types::ImageUsageFlags::DepthStencilAttachment, pvr::types::ImageLayout::DepthStencilAttachmentOptimal);
 
-	apiObject->colorTextureView = apiObject->context->createTextureView(colorTextureStore);
-  apiObject->depthTextureView = apiObject->context->createTextureView(depthTextureStore);
-
-	pvr::api::DescriptorSetUpdate descSetUpdate;
-	descSetUpdate.setCombinedImageSampler(0, apiObject->colorTextureView, samplerColor);
-  descSetUpdate.setCombinedImageSampler(1, apiObject->depthTextureView, samplerDepth);
-	apiObject->descSet = apiObject->context->createDescriptorSetOnDefaultPool(apiObject->descSetLayout);
-	if(!apiObject->descSet.isValid())
-  {
-    return pvr::Result::UnknownError;
+  std::vector <pvr::api::OnScreenFboCreateParam> fboInfo;
+  fboInfo.resize(apiObject->context->getSwapChainLength());
+  for (uint i = 0; i < apiObject->context->getSwapChainLength(); ++i) {
+    pvr::api::TextureView colorTextureView = apiObject->context->createTextureView(colorTextureStore);
+    pvr::api::TextureView depthTextureView = apiObject->context->createTextureView(depthTextureStore);
+    fboInfo[i].setOffScreenColor(1, colorTextureView);
+    fboInfo[i].setOffScreenDepthStencil(1, depthTextureView);
   }
-	apiObject->descSet->update(descSetUpdate);
+  pvr::api::ImageDataFormat colorDataFormat(pvr::PixelFormat::RGBA_8888, pvr::VariableType::UnsignedByteNorm, pvr::types::ColorSpace::lRGB);
+  pvr::api::ImageDataFormat depthDataFormat(pvr::PixelFormat::Depth24Stencil8, pvr::VariableType::UnsignedByteNorm, pvr::types::ColorSpace::lRGB);
 
-	return pvr::Result::Success;
+  pvr::api::RenderPassColorInfo renderPassColorInfo(colorDataFormat, pvr::types::LoadOp::Load, pvr::types::StoreOp::Store);
+  pvr::api::RenderPassDepthStencilInfo renderPassDepthStencilInfo(depthDataFormat, pvr::types::LoadOp::Load, pvr::types::StoreOp::Store, pvr::types::LoadOp::Ignore, pvr::types::StoreOp::Ignore);
+
+  pvr::api::RenderPassCreateParam renderPassInfo;
+  renderPassInfo.setColorInfo(0, apiObject->context->getPresentationImageFormat());
+  renderPassInfo.setColorInfo(1, renderPassColorInfo);
+  renderPassInfo.setDepthStencilInfo(renderPassDepthStencilInfo);
+  return true;
 }
 
 bool MyDemo::configureGraphicsPipeline()
