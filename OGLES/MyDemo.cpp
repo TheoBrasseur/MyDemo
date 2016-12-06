@@ -19,6 +19,7 @@ class MyDemo : public pvr::Shell
 		pvr::api::CommandBuffer commandBuffer;
 		pvr::api::Fbo fbo;
 		pvr::api::DescriptorSetLayout descSetLayout;
+    pvr::api::RenderPass renderPass;
 		pvr::api::PipelineLayout pipelineLayout;
 		pvr::api::DescriptorSet descSet;
 		std::vector<pvr::api::Buffer> vbos;
@@ -28,6 +29,7 @@ class MyDemo : public pvr::Shell
   glm::mat4 viewMatrix;
   glm::mat4 projMatrix;
   glm::mat4 mvp;
+
   pvr::api::AssetStore assetStore;
   pvr::assets::ModelHandle modelHandle;
 	std::auto_ptr<ApiObject> apiObject;
@@ -140,6 +142,9 @@ bool MyDemo::createFbo()
   renderPassInfo.setColorInfo(0, apiObject->context->getPresentationImageFormat());
   renderPassInfo.setColorInfo(1, renderPassColorInfo);
   renderPassInfo.setDepthStencilInfo(renderPassDepthStencilInfo);
+
+  apiObject->renderPass = apiObject->context->createRenderPass(renderPassInfo);
+
   return true;
 }
 
