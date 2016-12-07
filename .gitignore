@@ -10,10 +10,10 @@ Vulkan/Build/*
 Vulkan/Build/WindowsVC2010/*
 Vulkan/Build/LinuxGeneric/*
 
-!Vulkan/Build/WindowsVC2010/MyDemo.vcxproj
-!Vulkan/Build/WindowsVC2010/MyDemo.sln
-!Vulkan/Build/WindowsVC2010/MyDemo.rc
-!Vulkan/Build/WindowsVC2010/MyDemo.vcxproj.filters
+!Vulkan/Build/WindowsVC2010/VulkanMyDemo.vcxproj
+!Vulkan/Build/WindowsVC2010/VulkanMyDemo.sln
+!Vulkan/Build/WindowsVC2010/VulkanMyDemo.rc
+!Vulkan/Build/WindowsVC2010/VulkanMyDemo.vcxproj.filters
 
 !Vulkan/Build/LinuxGeneric/Makefile
 
