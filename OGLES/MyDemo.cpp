@@ -16,7 +16,6 @@ class MyDemo : public pvr::Shell
 	{
 		pvr::api::GraphicsPipeline graphicsPipeline;
 		pvr::GraphicsContext context;
-		pvr::api::CommandBuffer commandBuffer;
 		pvr::api::DescriptorSetLayout descSetLayout;
     pvr::api::RenderPass renderPass;
 		pvr::api::PipelineLayout pipelineLayout;
@@ -24,6 +23,7 @@ class MyDemo : public pvr::Shell
     pvr::api::FboSet fbos;
 		std::vector<pvr::api::Buffer> vbos;
 		std::vector<pvr::api::Buffer> ibos;
+    pvr::Multi <pvr::api::CommandBuffer> commandBuffer;
 	};
   glm::mat4 modelMatrix;
   glm::mat4 viewMatrix;
@@ -53,20 +53,20 @@ bool MyDemo::configureCommandBuffer()
 {
 	for(pvr::uint32 i = 0; i < apiObject->context->getSwapChainLength(); i++)
   {
-    apiObject->commandBuffer->beginRecording();
-    apiObject->commandBuffer->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
-    apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
-    apiObject->commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
-    apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
+    apiObject->commandBuffer[i]->beginRecording();
+    apiObject->commandBuffer[i]->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
+    apiObject->commandBuffer[i]->bindPipeline(apiObject->graphicsPipeline);
+    apiObject->commandBuffer[i]->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
+    apiObject->commandBuffer[i]->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
     drawMesh(0);
     pvr::api::SecondaryCommandBuffer uiCmdBuffer = apiObject->context->createSecondaryCommandBufferOnDefaultPool();
     uiRenderer.beginRendering(uiCmdBuffer);
     uiRenderer.getDefaultTitle()->render();
     uiRenderer.getSdkLogo()->render();
-    apiObject->commandBuffer->enqueueSecondaryCmds(uiCmdBuffer);
+    apiObject->commandBuffer[i]->enqueueSecondaryCmds(uiCmdBuffer);
     uiRenderer.endRendering();
-    apiObject->commandBuffer->endRenderPass();
-    apiObject->commandBuffer->endRecording();
+    apiObject->commandBuffer[i]->endRenderPass();
+    apiObject->commandBuffer[i]->endRecording();
   }
 
 	return true;
@@ -219,7 +219,10 @@ pvr::Result MyDemo::initView()
 {
 	apiObject.reset(new ApiObject());
 	apiObject->context = getGraphicsContext();
-  apiObject->commandBuffer = apiObject->context->createCommandBufferOnDefaultPool();
+  for (int i = 0; i < apiObject->context->getSwapChainLength(); ++i)
+  {
+    apiObject->commandBuffer[i] = apiObject->context->createCommandBufferOnDefaultPool();
+  }
 
   pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos); 
 
