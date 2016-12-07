@@ -2,10 +2,10 @@
 log.txt
 *glsldevil
 
-Vulkan/Build/*
+#Vulkan/Build/*
 
-!Vulkan/Build/WindowsVC2010
-!Vulkan/Build/LinuxGeneric
+!Vulkan/Build/WindowsVC2010/
+!Vulkan/Build/LinuxGeneric/
 
 Vulkan/Build/WindowsVC2010/*
 Vulkan/Build/LinuxGeneric/*
@@ -31,6 +31,3 @@ OGLES/Build/LinuxGeneric/*
 !OGLES/Build/WindowsVC2010/VulkanMyDemo.vcxproj.filters
 
 !OGLES/Build/LinuxGeneric/Makefile
-
-
-
