@@ -2,7 +2,7 @@
 log.txt
 *glsldevil
 
-#Vulkan/Build/*
+Vulkan/Build/*
 
 !Vulkan/Build/WindowsVC2010/
 !Vulkan/Build/LinuxGeneric/
