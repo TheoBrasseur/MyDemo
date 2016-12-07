@@ -2,3 +2,27 @@
 log.txt
 *glsldevil
 
+Vulkan/Build/*
+OGLES/Build/*
+
+!Build/WindowsVC2010
+!Build/LinuxGeneric
+
+Build/WindowsVC2010/*
+Build/LinuxGeneric/*
+
+!OGLES/Build/WindowsVC2010/VulkanMyDemo.vcxproj
+!OGLES/Build/WindowsVC2010/VulkanMyDemo.sln
+!OGLES/Build/WindowsVC2010/VulkanMyDemo.rc
+!OGLES/Build/WindowsVC2010/VulkanMyDemo.vcxproj.filters
+
+!Vulkan/Build/WindowsVC2010/MyDemo.vcxproj
+!Vulkan/Build/WindowsVC2010/MyDemo.sln
+!Vulkan/Build/WindowsVC2010/MyDemo.rc
+!Vulkan/Build/WindowsVC2010/MyDemo.vcxproj.filters
+
+!OGLES/Build/LinuxGeneric/Makefile
+!OGLES/Build/LinuxGeneric/Makefile
+
+
+
