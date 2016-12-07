@@ -17,11 +17,11 @@ class MyDemo : public pvr::Shell
 		pvr::api::GraphicsPipeline graphicsPipeline;
 		pvr::GraphicsContext context;
 		pvr::api::CommandBuffer commandBuffer;
-		pvr::api::Fbo fbo;
 		pvr::api::DescriptorSetLayout descSetLayout;
     pvr::api::RenderPass renderPass;
 		pvr::api::PipelineLayout pipelineLayout;
 		pvr::api::DescriptorSet descSet;
+    pvr::api::FboSet fbos;
 		std::vector<pvr::api::Buffer> vbos;
 		std::vector<pvr::api::Buffer> ibos;
 	};
@@ -37,7 +37,7 @@ class MyDemo : public pvr::Shell
 
   pvr::Result createDescriptorSet();
 	pvr::Result drawMesh(int nodeIndex);
-  bool createFbo();
+  bool configureFbo();
 	bool configureGraphicsPipeline();
 	bool configureCommandBuffer();
 
@@ -51,20 +51,23 @@ public:
 
 bool MyDemo::configureCommandBuffer()
 {
-	apiObject->commandBuffer->beginRecording();
-	apiObject->commandBuffer->beginRenderPass(apiObject->fbo, pvr::Rectanglei(0, 0, this->getWidth(), this->getHeight()), true, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
-	apiObject->commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
-	apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
-	drawMesh(0);
-	pvr::api::SecondaryCommandBuffer uiCmdBuffer = apiObject->context->createSecondaryCommandBufferOnDefaultPool();
-	uiRenderer.beginRendering(uiCmdBuffer);
-	uiRenderer.getDefaultTitle()->render();
-	uiRenderer.getSdkLogo()->render();
-	apiObject->commandBuffer->enqueueSecondaryCmds(uiCmdBuffer);
-	uiRenderer.endRendering();
-	apiObject->commandBuffer->endRenderPass();
-	apiObject->commandBuffer->endRecording();
+	for(pvr::uint32 i = 0; i < apiObject->context->getSwapChainLength(); i++)
+  {
+    apiObject->commandBuffer->beginRecording();
+    apiObject->commandBuffer->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
+    apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
+    apiObject->commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->descSet);
+    apiObject->commandBuffer->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
+    drawMesh(0);
+    pvr::api::SecondaryCommandBuffer uiCmdBuffer = apiObject->context->createSecondaryCommandBufferOnDefaultPool();
+    uiRenderer.beginRendering(uiCmdBuffer);
+    uiRenderer.getDefaultTitle()->render();
+    uiRenderer.getSdkLogo()->render();
+    apiObject->commandBuffer->enqueueSecondaryCmds(uiCmdBuffer);
+    uiRenderer.endRendering();
+    apiObject->commandBuffer->endRenderPass();
+    apiObject->commandBuffer->endRecording();
+  }
 
 	return true;
 }
@@ -110,7 +113,7 @@ pvr::Result MyDemo::createDescriptorSet()
 	return pvr::Result::Success;
 }
 
-bool MyDemo::createFbo()
+bool MyDemo::configureFbo()
 {
   pvr::api::TextureStore colorTextureStore;
   pvr::api::TextureStore depthTextureStore;
@@ -124,6 +127,9 @@ bool MyDemo::createFbo()
   colorTextureStore->allocate2D(colorImageStorageFormat, getWidth(), getHeight(), pvr::types::ImageUsageFlags::ColorAttachment, pvr::types::ImageLayout::ColorAttachmentOptimal);
   depthTextureStore->allocate2D(depthImageStorageFormat, getWidth(), getHeight(), pvr::types::ImageUsageFlags::DepthStencilAttachment, pvr::types::ImageLayout::DepthStencilAttachmentOptimal);
 
+  apiObject->fbos = apiObject->context->createOnScreenFboSet();
+  apiObject->fbos.resize(apiObject->context->getSwapChainLength());
+
   std::vector <pvr::api::OnScreenFboCreateParam> fboInfo;
   fboInfo.resize(apiObject->context->getSwapChainLength());
   for (uint i = 0; i < apiObject->context->getSwapChainLength(); ++i) {
@@ -131,19 +137,21 @@ bool MyDemo::createFbo()
     pvr::api::TextureView depthTextureView = apiObject->context->createTextureView(depthTextureStore);
     fboInfo[i].setOffScreenColor(1, colorTextureView);
     fboInfo[i].setOffScreenDepthStencil(1, depthTextureView);
-  }
+    apiObject->fbos[i] = apiObject->context->createOnScreenFboSet
+  }                       
   pvr::api::ImageDataFormat colorDataFormat(pvr::PixelFormat::RGBA_8888, pvr::VariableType::UnsignedByteNorm, pvr::types::ColorSpace::lRGB);
   pvr::api::ImageDataFormat depthDataFormat(pvr::PixelFormat::Depth24Stencil8, pvr::VariableType::UnsignedByteNorm, pvr::types::ColorSpace::lRGB);
 
   pvr::api::RenderPassColorInfo renderPassColorInfo(colorDataFormat, pvr::types::LoadOp::Load, pvr::types::StoreOp::Store);
   pvr::api::RenderPassDepthStencilInfo renderPassDepthStencilInfo(depthDataFormat, pvr::types::LoadOp::Load, pvr::types::StoreOp::Store, pvr::types::LoadOp::Ignore, pvr::types::StoreOp::Ignore);
 
+
   pvr::api::RenderPassCreateParam renderPassInfo;
   renderPassInfo.setColorInfo(0, apiObject->context->getPresentationImageFormat());
   renderPassInfo.setColorInfo(1, renderPassColorInfo);
   renderPassInfo.setDepthStencilInfo(renderPassDepthStencilInfo);
 
-  apiObject->renderPass = apiObject->context->createRenderPass(renderPassInfo);
+  apiObject->context->createRenderPass(renderPassInfo);
 
   return true;
 }
@@ -225,7 +233,7 @@ pvr::Result MyDemo::initView()
 		return pvr::Result::UnknownError;
 	}
 
-  apiObject->fbo = apiObject->context->createOnScreenFbo(0);
+  apiObject->fbos = apiObject->context->createOnScreenFbo(0);
 
   if (uiRenderer.init(apiObject->fbo->getRenderPass(), 0) != pvr::Result::Success)
   {
