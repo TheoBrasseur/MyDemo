@@ -151,10 +151,10 @@ bool MyDemo::configureGraphicsPipeline()
 	pipelineLayoutInfo.addDescSetLayout(apiObject->uboDescSetLayout);
 
 	shaderFile.populateValidVersions(vertexShaderFile, *this);
-	pipelineInfo.vertexShader = context->createShader(*shaderFile.getBestStreamForApi(context->getApiType()), pvr::types::ShaderType::VertexShader);
+	pipelineInfo.vertexShader = context->createShader(*shaderFile.getBestStreamForContext(context), pvr::types::ShaderType::VertexShader);
 
 	shaderFile.populateValidVersions(fragShaderFile, *this);
-	pipelineInfo.fragmentShader = context->createShader(*shaderFile.getBestStreamForApi(context->getApiType()), pvr::types::ShaderType::FragmentShader);
+	pipelineInfo.fragmentShader = context->createShader(*shaderFile.getBestStreamForContext(context), pvr::types::ShaderType::FragmentShader);
 
 	pvr::assets::Mesh mesh = modelHandle->getMesh(0);
 	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());

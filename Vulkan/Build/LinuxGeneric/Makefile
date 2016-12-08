@@ -23,9 +23,7 @@ RESOURCES += \
            VertShader_vk.vsh.spv\
 
 COMMON_RESOURCES += \
-           MarbleNormalMap.pvr\
-           Marble.pvr\
-           scene.pod\
+           teapot.pod\
 
 
 include $(SDKDIR)/Builds/Linux/make_example.mak
