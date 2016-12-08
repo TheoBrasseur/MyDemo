@@ -1,6 +1,7 @@
 #include <PVRShell/PVRShell.h>
 #include <PVRApi/PVRApi.h>
-#include <PVRUIRenderer/PVRUIRenderer.h>
+#include <PVREngineUtils/PVREngineUtils.h>
+
 
 const char * modelFilename = "teapot.pod";
 const char * textureFileName = "Marble.pvr";
@@ -30,11 +31,10 @@ class MyDemo : public pvr::Shell
 	glm::mat4 projMatrix;
 	glm::mat4 mvp;
 
+	pvr::utils::AssetStore assetStore;
 	pvr::GraphicsContext context;
-	pvr::api::AssetStore assetStore;
 	pvr::assets::ModelHandle modelHandle;
 	std::auto_ptr<ApiObject> apiObject;
-	pvr::ui::UIRenderer uiRenderer;
 
 	pvr::Result drawMesh(int nodeIndex, int swapChainIndex);
 	bool configureUbo();
@@ -78,11 +78,6 @@ bool MyDemo::configureCommandBuffer()
 		apiObject->commandBuffer[i]->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->uboDescSet[i]);
 		drawMesh(0, i);
 		pvr::api::SecondaryCommandBuffer uiCmdBuffer = context->createSecondaryCommandBufferOnDefaultPool();
-		uiRenderer.beginRendering(uiCmdBuffer);
-		uiRenderer.getDefaultTitle()->render();
-		uiRenderer.getSdkLogo()->render();
-		apiObject->commandBuffer[i]->enqueueSecondaryCmds(uiCmdBuffer);
-		uiRenderer.endRendering();
 		apiObject->commandBuffer[i]->endRenderPass();
 		apiObject->commandBuffer[i]->endRecording();
 	}
@@ -206,11 +201,6 @@ pvr::Result MyDemo::initView()
 		return pvr::Result::UnknownError;
 	}
 
-	if (uiRenderer.init(apiObject->fbos[context->getSwapChainIndex()]->getRenderPass(), 0) != pvr::Result::Success)
-	{
-		return pvr::Result::UnknownError;
-	}
-
 	glm::vec3 from, to, up;
 
 	pvr::float32 fovy, near, far;
@@ -244,7 +234,6 @@ pvr::Result MyDemo::initView()
 pvr::Result MyDemo::releaseView()
 {
 	apiObject.reset();
-	uiRenderer.release();
 	modelHandle.reset();
 	assetStore.releaseAll();
 	return pvr::Result::Success;
