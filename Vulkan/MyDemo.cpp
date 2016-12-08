@@ -129,15 +129,6 @@ bool MyDemo::configureFbo()
   apiObject->fbos.resize(context->getSwapChainLength());
 	apiObject->fbos = context->createOnScreenFboSet();
 
-	/* std::vector <pvr::api::OnScreenFboCreateParam> fbosInfo; */
-	/* fbosInfo.resize(context->getSwapChainLength()); */
-
-	/* for (size_t i = 0; i < context->getSwapChainLength(); i++) */
-	/* { */
-    /* /1* fbosInfo[i]. *1/ */
-    /* context->createOnS */
-	/* } */
-
 	return true;
 }
 
@@ -276,12 +267,7 @@ pvr::Result MyDemo::renderFrame()
   apiObject->ubo.setValue(0, mvp);
   apiObject->ubo.unmap(context->getSwapChainIndex());
 
-	for (int i = 0; i < context->getSwapChainLength(); ++i) {
-    pvr::api::DescriptorSetUpdate descSetUpdate;
-    descSetUpdate.setUbo(0, apiObject->mvpBufferView);
-	  apiObject->uboDescSet[i]->update(descSetUpdate);
-    apiObject->commandBuffer[i]->submit();
-	}
+  apiObject->commandBuffer[context->getSwapChainIndex()]->submit();
 
 	return pvr::Result::Success;
 }
