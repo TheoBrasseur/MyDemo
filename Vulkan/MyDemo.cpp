@@ -4,8 +4,8 @@
 
 const char * modelFilename = "teapot.pod";
 const char * textureFileName = "Marble.pvr";
-const char * vertexShaderFile = "VertShader_ES3.vsh";
-const char * fragShaderFile = "FragShader_ES3.fsh";
+const char * vertexShaderFile = "VertShader_vk.vsh";
+const char * fragShaderFile = "FragShader_vk.fsh";
 
 pvr::float32 angleY = glm::pi<pvr::float32>() / 16;
 pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"} };

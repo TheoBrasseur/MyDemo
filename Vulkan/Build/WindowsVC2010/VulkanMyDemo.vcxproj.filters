@@ -31,6 +31,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\FragShader_vk.fsh" />
+    <None Include="..\..\FragShader_vk.fsh.spv" />
+    <None Include="..\..\VertShader_vk.vsh.spv" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\VertShader_vk.vsh" />
