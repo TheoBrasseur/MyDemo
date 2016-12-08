@@ -166,14 +166,6 @@ bool MyDemo::configureGraphicsPipeline()
 
 	apiObject->graphicsPipeline = context->createGraphicsPipeline(pipelineInfo);
 
-	for (int i = 0; i < context->getSwapChainLength(); ++i) {
-    apiObject->commandBuffer[i]->beginRecording();
-    apiObject->commandBuffer[i]->bindPipeline(apiObject->graphicsPipeline);
-    /* apiObject->commandBuffer[i]->setUniform<pvr::int32>(apiObject->graphicsPipeline->getUniformLocation("sTexture"), 0); */
-    apiObject->commandBuffer[i]->endRecording();
-    apiObject->commandBuffer[i]->submit();
-	}
-
 	return true;
 }
 
@@ -195,10 +187,11 @@ pvr::Result MyDemo::initView()
 {
 	apiObject.reset(new ApiObject());
 	context = getGraphicsContext();
-	for (int i = 0; i < context->getSwapChainLength(); ++i)
-	{
-		apiObject->commandBuffer[i] = context->createCommandBufferOnDefaultPool();
-	}
+
+  for (int i = 0; i < context->getSwapChainLength(); ++i)
+  {
+    apiObject->commandBuffer[i] = context->createCommandBufferOnDefaultPool();
+  }
 
 	pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos);
 
@@ -212,9 +205,7 @@ pvr::Result MyDemo::initView()
 		return pvr::Result::UnknownError;
 	}
 
-	apiObject->fbos = apiObject->context->createOnScreenFbo(0);
-
-	if (uiRenderer.init(apiObject->fbo->getRenderPass(), 0) != pvr::Result::Success)
+	if (uiRenderer.init(apiObject->fbos[context->getSwapChainIndex()]->getRenderPass(), 0) != pvr::Result::Success)
 	{
 		return pvr::Result::UnknownError;
 	}
