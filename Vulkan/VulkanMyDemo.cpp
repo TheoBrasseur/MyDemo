@@ -1,6 +1,6 @@
 #include <PVRShell/PVRShell.h>
 #include <PVRApi/PVRApi.h>
-#include <PVRUIRenderer/PVRUIRenderer.h>
+#include <PVREngineUtils/PVREngineUtils.h>
 
 const char * modelFilename = "teapot.pod";
 const char * textureFileName = "Marble.pvr";
