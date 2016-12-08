@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1A52CC6C-2E29-428E-AEB6-29C572545CF1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -105,18 +106,20 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\..\..\Builds\Include;..\..\..\..\..\..\Framework;</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PVRCore.lib;PVRAssets.lib;PVRVulkanGlue.lib;PVRNativeVulkan.lib;PVRVulkan.lib;PVRShell.lib;PVRUIRenderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PVRCore.lib;PVRAssets.lib;PVRVulkanGlue.lib;PVRNativeVulkan.lib;PVRVulkan.lib;PVRShell.lib;PVREngineUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\..\..\..\Framework\Bin\WindowsVC2010\$(Configuration)_$(PlatformArchitecture);</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\..\..\Builds\Include;..\..\..\..\..\..\Framework;</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PVRCore.lib;PVRAssets.lib;PVRVulkanGlue.lib;PVRNativeVulkan.lib;PVRVulkan.lib;PVRShell.lib;PVRUIRenderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PVRCore.lib;PVRAssets.lib;PVRVulkanGlue.lib;PVRNativeVulkan.lib;PVRVulkan.lib;PVRShell.lib;PVREngineUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\..\..\..\Framework\Bin\WindowsVC2010\$(Configuration)_$(PlatformArchitecture);</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -128,15 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VulkanMyDemo.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\ProcessedAssets\teapot.pod" />
-    <None Include="..\..\FragShader_vk.fsh" />
-    <None Include="..\..\FragShader_vk.fsh.spv" />
-    <None Include="..\..\VertShader_vk.vsh.spv" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\..\VertShader_vk.vsh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
