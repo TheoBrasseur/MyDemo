@@ -126,16 +126,17 @@ pvr::Result MyDemo::drawMesh(int nodeIndex, int swapChainIndex)
 
 bool MyDemo::configureFbo()
 {
+  apiObject->fbos.resize(context->getSwapChainLength());
 	apiObject->fbos = context->createOnScreenFboSet();
-	apiObject->fbos.resize(context->getSwapChainLength());
 
-	std::vector <pvr::api::OnScreenFboCreateParam> fboInfo;
-	fboInfo.resize(context->getSwapChainLength());
-	
-	for (size_t i = 0; i < context->getSwapChainLength(); i++)
-	{
+	/* std::vector <pvr::api::OnScreenFboCreateParam> fbosInfo; */
+	/* fbosInfo.resize(context->getSwapChainLength()); */
 
-	}
+	/* for (size_t i = 0; i < context->getSwapChainLength(); i++) */
+	/* { */
+    /* /1* fbosInfo[i]. *1/ */
+    /* context->createOnS */
+	/* } */
 
 	return true;
 }
