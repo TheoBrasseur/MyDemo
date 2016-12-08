@@ -24,7 +24,6 @@ class MyDemo : public pvr::Shell
 		std::vector<pvr::api::Buffer> ibos;
 		std::vector <pvr::api::CommandBuffer> commandBuffer;
 		pvr::utils::StructuredMemoryView ubo;
-    pvr::api::BufferView mvpBufferView;
 	};
 	glm::mat4 modelMatrix;
 	glm::mat4 viewMatrix;
@@ -37,7 +36,7 @@ class MyDemo : public pvr::Shell
 	std::auto_ptr<ApiObject> apiObject;
 	pvr::ui::UIRenderer uiRenderer;
 
-	pvr::Result drawMesh(int nodeIndex);
+	pvr::Result drawMesh(int nodeIndex, int swapChainIndex);
   bool configureUbo();
 	bool configureFbo();
 	bool configureGraphicsPipeline();
@@ -77,8 +76,7 @@ bool MyDemo::configureCommandBuffer()
 		apiObject->commandBuffer[i]->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
 		apiObject->commandBuffer[i]->bindPipeline(apiObject->graphicsPipeline);
 		apiObject->commandBuffer[i]->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->uboDescSet[i]);
-		apiObject->commandBuffer[i]->setUniformPtr<glm::mat4>(apiObject->graphicsPipeline->getUniformLocation("mvp"), 1, &mvp);
-		drawMesh(0);
+		drawMesh(0, i);
 		pvr::api::SecondaryCommandBuffer uiCmdBuffer = context->createSecondaryCommandBufferOnDefaultPool();
 		uiRenderer.beginRendering(uiCmdBuffer);
 		uiRenderer.getDefaultTitle()->render();
@@ -92,16 +90,13 @@ bool MyDemo::configureCommandBuffer()
 	return true;
 }
 
-pvr::Result MyDemo::drawMesh(int nodeIndex)
+pvr::Result MyDemo::drawMesh(int nodeIndex, int swapChainIndex)
 {
 	pvr::uint32 meshId = modelHandle->getNode(nodeIndex).getObjectId();
 	pvr::assets::Mesh& mesh = modelHandle->getMesh(meshId);
 
-	for (pvr::uint16 i = 0; i < context->getSwapChainLength(); i++)
-	{
-		apiObject->commandBuffer[i]->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
-		apiObject->commandBuffer[i]->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
-	}
+  apiObject->commandBuffer[swapChainIndex]->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
+  apiObject->commandBuffer[swapChainIndex]->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
 
 	if (mesh.getNumStrips() != 0)
 	{
@@ -114,14 +109,14 @@ pvr::Result MyDemo::drawMesh(int nodeIndex)
 		{
 			for (pvr::uint16 i = 0; i < context->getSwapChainLength(); i++)
 			{
-				apiObject->commandBuffer[i]->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
+				apiObject->commandBuffer[swapChainIndex]->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
 			}
 		}
 		else
 		{
 			for (pvr::uint16 i = 0; i < context->getSwapChainLength(); i++)
 			{
-				apiObject->commandBuffer[i]->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
+				apiObject->commandBuffer[swapChainIndex]->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
 			}
 		}
 	}
