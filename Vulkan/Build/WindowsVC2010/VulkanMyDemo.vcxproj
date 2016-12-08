@@ -111,6 +111,15 @@
   <ItemGroup>
     <ClCompile Include="..\..\VulkanMyDemo.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\ProcessedAssets\teapot.pod" />
+    <None Include="..\..\FragShader_vk.fsh" />
+    <None Include="..\..\FragShader_vk.fsh.spv" />
+    <None Include="..\..\VertShader_vk.vsh.spv" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\VertShader_vk.vsh" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

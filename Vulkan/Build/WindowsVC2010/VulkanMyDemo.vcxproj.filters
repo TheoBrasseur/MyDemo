@@ -29,4 +29,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\FragShader_vk.fsh" />
+    <None Include="..\..\..\ProcessedAssets\teapot.pod" />
+    <None Include="..\..\VertShader_vk.vsh.spv" />
+    <None Include="..\..\FragShader_vk.fsh.spv" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\VertShader_vk.vsh" />
+  </ItemGroup>
 </Project>
