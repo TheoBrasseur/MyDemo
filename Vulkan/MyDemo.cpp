@@ -24,6 +24,7 @@ class MyDemo : public pvr::Shell
 		std::vector<pvr::api::Buffer> ibos;
 		std::vector <pvr::api::CommandBuffer> commandBuffer;
 		pvr::utils::StructuredMemoryView ubo;
+    pvr::api::BufferView mvpBufferView;
 	};
 	glm::mat4 modelMatrix;
 	glm::mat4 viewMatrix;
@@ -36,8 +37,8 @@ class MyDemo : public pvr::Shell
 	std::auto_ptr<ApiObject> apiObject;
 	pvr::ui::UIRenderer uiRenderer;
 
-	pvr::Result createDescriptorSet();
 	pvr::Result drawMesh(int nodeIndex);
+  bool configureUbo();
 	bool configureFbo();
 	bool configureGraphicsPipeline();
 	bool configureCommandBuffer();
@@ -49,6 +50,24 @@ public:
 	virtual pvr::Result renderFrame();
 	virtual pvr::Result releaseView();
 };
+
+bool MyDemo::configureUbo()
+{
+  pvr::api::DescriptorSetUpdate descSetUpdate;
+  apiObject->uboDescSet.resize(context->getSwapChainLength());
+  for (int i = 0; i < context->getSwapChainLength(); ++i) {
+    apiObject->ubo.addEntryPacked("MVPMatrix", pvr::types::GpuDatatypes::mat4x4, i);
+    pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, 0);
+    pvr::api::BufferView uboBufferView = context->createBufferView(uboBuffer, 0, uboBuffer->getSize());
+    apiObject->ubo.connectWithBuffer(i, uboBufferView, pvr::types::BufferViewTypes::UniformBuffer, pvr::types::MapBufferFlags::Write, 0);
+    apiObject->uboDescSet[i] = context->createDescriptorSetOnDefaultPool(apiObject->uboDescSetLayout);
+    descSetUpdate.setUbo(0, apiObject->ubo.getConnectedBuffer(i)); 
+    apiObject->uboDescSet[i]->update(descSetUpdate);
+  }
+
+  return true;
+}
+
 
 bool MyDemo::configureCommandBuffer()
 {
@@ -110,23 +129,6 @@ pvr::Result MyDemo::drawMesh(int nodeIndex)
 	return pvr::Result::Success;
 }
 
-pvr::Result MyDemo::createDescriptorSet()
-{
-	pvr::api::DescriptorSetUpdate descSetUpdate;
-	for (pvr::uint32 i = 0; i < context->getSwapChainLength(); i++)
-	{
-		apiObject->uboDescSet[i] = context->createDescriptorSetOnDefaultPool(apiObject->uboDescSetLayout);
-		if (!apiObject->uboDescSet[i].isValid())
-		{
-			pvr::Log(pvr::Log.Error, "Failed to create descriptor sets");
-			return pvr::Result::UnknownError;
-		}
-		apiObject->uboDescSet[i]->update(descSetUpdate);
-	}
-	
-	return pvr::Result::Success;
-}
-
 bool MyDemo::configureFbo()
 {
 	apiObject->fbos = context->createOnScreenFboSet();
@@ -152,22 +154,20 @@ bool MyDemo::configureGraphicsPipeline()
 	pvr::assets::ShaderFile shaderFile;
 
 	pvr::api::DescriptorSetLayoutCreateParam descSetLayoutInfo;
-	descSetLayoutInfo.setBinding(0, pvr::types::DescriptorType::StorageImage, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
-	descSetLayoutInfo.setBinding(1, pvr::types::DescriptorType::StorageImage, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
+	descSetLayoutInfo.setBinding(0, pvr::types::DescriptorType::UniformBufferDynamic, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
 
-	apiObject->descSetLayout = context->createDescriptorSetLayout(descSetLayoutInfo);
+	apiObject->uboDescSetLayout = context->createDescriptorSetLayout(descSetLayoutInfo);
 
 	pipelineInfo.colorBlend.setAttachmentState(0, colorBlendState);
 
 	pvr::api::PipelineLayoutCreateParam pipelineLayoutInfo;
-	pipelineLayoutInfo.addDescSetLayout(apiObject->descSetLayout);
+	pipelineLayoutInfo.addDescSetLayout(apiObject->uboDescSetLayout);
 
 	shaderFile.populateValidVersions(vertexShaderFile, *this);
 	pipelineInfo.vertexShader = context->createShader(*shaderFile.getBestStreamForApi(context->getApiType()), pvr::types::ShaderType::VertexShader);
 
 	shaderFile.populateValidVersions(fragShaderFile, *this);
 	pipelineInfo.fragmentShader = context->createShader(*shaderFile.getBestStreamForApi(context->getApiType()), pvr::types::ShaderType::FragmentShader);
-
 
 	pvr::assets::Mesh mesh = modelHandle->getMesh(0);
 	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());
@@ -179,11 +179,13 @@ bool MyDemo::configureGraphicsPipeline()
 
 	apiObject->graphicsPipeline = context->createGraphicsPipeline(pipelineInfo);
 
-	apiObject->commandBuffer->beginRecording();
-	apiObject->commandBuffer->bindPipeline(apiObject->graphicsPipeline);
-	/* apiObject->commandBuffer->setUniform<pvr::int32>(apiObject->graphicsPipeline->getUniformLocation("sTexture"), 0); */
-	apiObject->commandBuffer->endRecording();
-	apiObject->commandBuffer->submit();
+	for (int i = 0; i < context->getSwapChainLength(); ++i) {
+    apiObject->commandBuffer[i]->beginRecording();
+    apiObject->commandBuffer[i]->bindPipeline(apiObject->graphicsPipeline);
+    /* apiObject->commandBuffer[i]->setUniform<pvr::int32>(apiObject->graphicsPipeline->getUniformLocation("sTexture"), 0); */
+    apiObject->commandBuffer[i]->endRecording();
+    apiObject->commandBuffer[i]->submit();
+	}
 
 	return true;
 }
@@ -205,10 +207,10 @@ pvr::Result MyDemo::initApplication()
 pvr::Result MyDemo::initView()
 {
 	apiObject.reset(new ApiObject());
-	apiObject->context = getGraphicsContext();
-	for (int i = 0; i < apiObject->context->getSwapChainLength(); ++i)
+	context = getGraphicsContext();
+	for (int i = 0; i < context->getSwapChainLength(); ++i)
 	{
-		apiObject->commandBuffer[i] = apiObject->context->createCommandBufferOnDefaultPool();
+		apiObject->commandBuffer[i] = context->createCommandBufferOnDefaultPool();
 	}
 
 	pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos);
@@ -218,7 +220,7 @@ pvr::Result MyDemo::initView()
 		return pvr::Result::UnknownError;
 	}
 
-	if (createDescriptorSet() != pvr::Result::Success)
+	if (!configureUbo())
 	{
 		return pvr::Result::UnknownError;
 	}
@@ -271,10 +273,19 @@ pvr::Result MyDemo::releaseView()
 
 pvr::Result MyDemo::renderFrame()
 {
-	angleY = (glm::pi<pvr::float32>() / 150) * 0.05f * this->getFrameTime();
-	modelMatrix = glm::rotate(angleY, glm::vec3(0.0f, 1.0f, 0.0f));
-	mvp = mvp * modelMatrix;
-	apiObject->commandBuffer->submit();
+  angleY = (glm::pi<pvr::float32>() / 150) * 0.05f * this->getFrameTime();
+  modelMatrix = glm::rotate(angleY, glm::vec3(0.0f, 1.0f, 0.0f));
+  mvp = mvp * modelMatrix;
+  apiObject->ubo.map(context->getSwapChainIndex(), pvr::types::MapBufferFlags::Write, 0);
+  apiObject->ubo.setValue(0, mvp);
+  apiObject->ubo.unmap(context->getSwapChainIndex());
+
+	for (int i = 0; i < context->getSwapChainLength(); ++i) {
+    pvr::api::DescriptorSetUpdate descSetUpdate;
+    descSetUpdate.setUbo(0, apiObject->mvpBufferView);
+	  apiObject->uboDescSet[i]->update(descSetUpdate);
+    apiObject->commandBuffer[i]->submit();
+	}
 
 	return pvr::Result::Success;
 }
