@@ -20,13 +20,22 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\VulkanMyDemo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ResourceCompile Include="VulkanMyDemo.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\VulkanMyDemo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <None Include="..\..\FragShader_vk.fsh" />
+    <None Include="..\..\FragShader_vk.fsh.spv" />
+    <None Include="..\..\VertShader_vk.vsh.spv" />
+    <None Include="..\..\..\ProcessedAssets\teapot.pod" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\VertShader_vk.vsh" />
   </ItemGroup>
 </Project>
