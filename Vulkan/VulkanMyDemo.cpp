@@ -125,32 +125,29 @@ bool MyDemo::configureGraphicsPipeline()
 {
 	pvr::api::GraphicsPipelineCreateParam pipelineInfo;
 	pvr::types::BlendingConfig colorBlendState;
+	
 	colorBlendState.blendEnable = false;
+	pipelineInfo.colorBlend.setAttachmentState(0, colorBlendState);
 
 	pvr::api::DescriptorSetLayoutCreateParam descSetLayoutInfo;
-	descSetLayoutInfo.setBinding(0, pvr::types::DescriptorType::UniformBufferDynamic, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
-
+	descSetLayoutInfo.setBinding(0, pvr::types::DescriptorType::UniformBuffer, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
 	apiObject->uboDescSetLayout = context->createDescriptorSetLayout(descSetLayoutInfo);
-
-	pipelineInfo.colorBlend.setAttachmentState(0, colorBlendState);
 
 	pvr::api::PipelineLayoutCreateParam pipelineLayoutInfo;
 	pipelineLayoutInfo.addDescSetLayout(apiObject->uboDescSetLayout);
-
+	apiObject->pipelineLayout = context->createPipelineLayout(pipelineLayoutInfo);
 
 	pipelineInfo.vertexShader = context->createShader(*getAssetStream(vertexShaderFile), pvr::types::ShaderType::VertexShader);
 	pipelineInfo.fragmentShader = context->createShader(*getAssetStream(fragShaderFile), pvr::types::ShaderType::FragmentShader);
-	if (!pipelineInfo.vertexShader.getShader().isValid() ||
-		!pipelineInfo.fragmentShader.getShader().isValid())
+	if (!pipelineInfo.vertexShader.getShader().isValid() || !pipelineInfo.fragmentShader.getShader().isValid())
 	{
 		setExitMessage("Failed to create vertshader or Fragment shader");
 		return false;
 	}
 
 	pvr::assets::Mesh mesh = modelHandle->getMesh(0);
+	pipelineInfo.pipelineLayout = apiObject->pipelineLayout;
 	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());
-	pipelineInfo.inputAssembler.setPrimitiveTopology(pvr::types::PrimitiveTopology::TriangleList);
-	apiObject->pipelineLayout = context->createPipelineLayout(pipelineLayoutInfo);
 	pipelineInfo.rasterizer.setCullFace(pvr::types::Face::Back);
 	pipelineInfo.renderPass = apiObject->fbos[0]->getRenderPass();
 	pipelineInfo.depthStencil.setDepthTestEnable(true).setDepthCompareFunc(pvr::types::ComparisonMode::Less).setDepthWrite(true);
@@ -183,6 +180,7 @@ pvr::Result MyDemo::initView()
 
 	if (!configureFbo())
 	{
+		setExitMessage("Failed to create FBO");
 		return pvr::Result::UnknownError;
 	}
 
@@ -194,6 +192,7 @@ pvr::Result MyDemo::initView()
 
 	if (!configureUbo())
 	{
+		setExitMessage("Failed to create UBO");
 		return pvr::Result::UnknownError;
 	}
 
