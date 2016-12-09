@@ -4,8 +4,8 @@
 
 const char * modelFilename = "teapot.pod";
 const char * textureFileName = "Marble.pvr";
-const char * vertexShaderFile = "VertShader_vk.vsh";
-const char * fragShaderFile = "FragShader_vk.fsh";
+const char * vertexShaderFile = "VertShader_vk.spv";
+const char * fragShaderFile = "FragShader_vk.spv";
 
 pvr::float32 angleY = glm::pi<pvr::float32>() / 16;
 pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"} };
@@ -42,11 +42,11 @@ class MyDemo : public pvr::Shell
 	bool configureCommandBuffer();
 
 public:
-	virtual pvr::Result initApplication();
-	virtual pvr::Result initView();
-	virtual pvr::Result quitApplication();
-	virtual pvr::Result renderFrame();
-	virtual pvr::Result releaseView();
+virtual pvr::Result initApplication();
+virtual pvr::Result initView();
+virtual pvr::Result quitApplication();
+virtual pvr::Result renderFrame();
+virtual pvr::Result releaseView();
 };
 
 bool MyDemo::configureUbo()
@@ -115,7 +115,7 @@ pvr::Result MyDemo::drawMesh(int nodeIndex, pvr::api::CommandBuffer commandBuffe
 }
 
 bool MyDemo::configureFbo()
-{	
+{
 	apiObject->fbos = context->createOnScreenFboSet();
 
 	return true;
@@ -127,8 +127,6 @@ bool MyDemo::configureGraphicsPipeline()
 	pvr::types::BlendingConfig colorBlendState;
 	colorBlendState.blendEnable = false;
 
-	pvr::assets::ShaderFile shaderFile;
-
 	pvr::api::DescriptorSetLayoutCreateParam descSetLayoutInfo;
 	descSetLayoutInfo.setBinding(0, pvr::types::DescriptorType::UniformBufferDynamic, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
 
@@ -139,11 +137,15 @@ bool MyDemo::configureGraphicsPipeline()
 	pvr::api::PipelineLayoutCreateParam pipelineLayoutInfo;
 	pipelineLayoutInfo.addDescSetLayout(apiObject->uboDescSetLayout);
 
-	shaderFile.populateValidVersions(vertexShaderFile, *this);
-	pipelineInfo.vertexShader = context->createShader(*shaderFile.getBestStreamForContext(context), pvr::types::ShaderType::VertexShader);
 
-	shaderFile.populateValidVersions(fragShaderFile, *this);
-	pipelineInfo.fragmentShader = context->createShader(*shaderFile.getBestStreamForContext(context), pvr::types::ShaderType::FragmentShader);
+	pipelineInfo.vertexShader = context->createShader(*getAssetStream(vertexShaderFile), pvr::types::ShaderType::VertexShader);
+	pipelineInfo.fragmentShader = context->createShader(*getAssetStream(fragShaderFile), pvr::types::ShaderType::FragmentShader);
+	if (!pipelineInfo.vertexShader.getShader().isValid() ||
+		!pipelineInfo.fragmentShader.getShader().isValid())
+	{
+		setExitMessage("Failed to create vertshader or Fragment shader");
+		return false;
+	}
 
 	pvr::assets::Mesh mesh = modelHandle->getMesh(0);
 	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());
@@ -186,6 +188,7 @@ pvr::Result MyDemo::initView()
 
 	if (!configureGraphicsPipeline())
 	{
+		setExitMessage("Failed to create graphics pipeline");
 		return pvr::Result::UnknownError;
 	}
 
