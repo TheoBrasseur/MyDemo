@@ -55,7 +55,7 @@ bool MyDemo::configureUbo()
 	apiObject->uboDescSet.resize(context->getSwapChainLength());
 	apiObject->ubo.addEntryPacked("MVPMatrix", pvr::types::GpuDatatypes::mat4x4);
 	for (int i = 0; i < getPlatformContext().getSwapChainLength(); ++i) {
-		pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, 0);
+		pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, true);
 		pvr::api::BufferView uboBufferView = context->createBufferView(uboBuffer, 0, apiObject->ubo.getAlignedElementSize());
 		apiObject->ubo.connectWithBuffer(i, uboBufferView, pvr::types::BufferViewTypes::UniformBuffer, pvr::types::MapBufferFlags::Write, 0);
 		apiObject->uboDescSet[i] = context->createDescriptorSetOnDefaultPool(apiObject->uboDescSetLayout);
@@ -69,13 +69,13 @@ bool MyDemo::configureUbo()
 bool MyDemo::configureCommandBuffer()
 {
 	apiObject->commandBuffer.resize(getPlatformContext().getSwapChainLength());
-	for (pvr::uint32 i = 0; i < context->getSwapChainLength(); ++i)
+	for (pvr::uint32 i = 0; i < getPlatformContext().getSwapChainLength(); ++i)
 	{
 		apiObject->commandBuffer[i] = context->createCommandBufferOnDefaultPool();
 		pvr::api::CommandBuffer commandBuffer = apiObject->commandBuffer[i];
 		commandBuffer->beginRecording();
 		//commandBuffer->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
-		commandBuffer->beginRenderPass(apiObject->fbos[i], pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
+		commandBuffer->beginRenderPass(apiObject->fbos[i], pvr::Rectanglei(0, 0, getWidth(), getHeight()), true, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
 		commandBuffer->bindPipeline(apiObject->graphicsPipeline);
 		commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->uboDescSet[i]);
 		drawMesh(0, commandBuffer);
@@ -92,8 +92,7 @@ pvr::Result MyDemo::drawMesh(int nodeIndex, pvr::api::CommandBuffer commandBuffe
 	pvr::assets::Mesh& mesh = modelHandle->getMesh(meshId);
 
 	commandBuffer->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
-	commandBuffer->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
-
+	
 	if (mesh.getNumStrips() != 0)
 	{
 		pvr::Log(pvr::Log.Error, "Model is not a triangle list");
@@ -103,6 +102,7 @@ pvr::Result MyDemo::drawMesh(int nodeIndex, pvr::api::CommandBuffer commandBuffe
 	{
 		if (apiObject->ibos[meshId].isValid())
 		{
+			commandBuffer->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
 			commandBuffer->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
 		}
 		else

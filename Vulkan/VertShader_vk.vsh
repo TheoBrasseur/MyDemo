@@ -11,4 +11,5 @@ void main()
 {
 	// Transform position
 	gl_Position = MVPMatrix * inPositions;
+	gl_Position.y *= -1;
 }
