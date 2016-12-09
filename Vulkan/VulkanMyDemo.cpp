@@ -74,11 +74,11 @@ bool MyDemo::configureCommandBuffer()
 		apiObject->commandBuffer[i] = context->createCommandBufferOnDefaultPool();
 		pvr::api::CommandBuffer commandBuffer = apiObject->commandBuffer[i];
 		commandBuffer->beginRecording();
-		commandBuffer->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
+		//commandBuffer->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
+		commandBuffer->beginRenderPass(apiObject->fbos[i], pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
 		commandBuffer->bindPipeline(apiObject->graphicsPipeline);
 		commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->uboDescSet[i]);
 		drawMesh(0, commandBuffer);
-		pvr::api::SecondaryCommandBuffer uiCmdBuffer = context->createSecondaryCommandBufferOnDefaultPool();
 		commandBuffer->endRenderPass();
 		commandBuffer->endRecording();
 	}
@@ -115,8 +115,7 @@ pvr::Result MyDemo::drawMesh(int nodeIndex, pvr::api::CommandBuffer commandBuffe
 }
 
 bool MyDemo::configureFbo()
-{
-	apiObject->fbos.resize(context->getSwapChainLength());
+{	
 	apiObject->fbos = context->createOnScreenFboSet();
 
 	return true;
@@ -151,18 +150,18 @@ bool MyDemo::configureGraphicsPipeline()
 	pipelineInfo.inputAssembler.setPrimitiveTopology(pvr::types::PrimitiveTopology::TriangleList);
 	apiObject->pipelineLayout = context->createPipelineLayout(pipelineLayoutInfo);
 	pipelineInfo.rasterizer.setCullFace(pvr::types::Face::Back);
+	pipelineInfo.renderPass = apiObject->fbos[0]->getRenderPass();
 	pipelineInfo.depthStencil.setDepthTestEnable(true).setDepthCompareFunc(pvr::types::ComparisonMode::Less).setDepthWrite(true);
 	pvr::utils::createInputAssemblyFromMesh(mesh, vertexBinding_Names, sizeof(vertexBinding_Names) / sizeof(vertexBinding_Names[0]), pipelineInfo);
 
 	apiObject->graphicsPipeline = context->createGraphicsPipeline(pipelineInfo);
 
-	return true;
+	return (apiObject->graphicsPipeline.isValid());
 }
 
 pvr::Result MyDemo::initApplication()
 {
 	assetStore.init(*this);
-	int numNode;
 
 	// Load model
 	if (!assetStore.loadModel(modelFilename, modelHandle, false))
@@ -180,11 +179,11 @@ pvr::Result MyDemo::initView()
 	
 	pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos);
 
-
 	if (!configureFbo())
 	{
 		return pvr::Result::UnknownError;
 	}
+
 	if (!configureGraphicsPipeline())
 	{
 		return pvr::Result::UnknownError;
