@@ -212,7 +212,7 @@ pvr::Result MyDemo::initView()
 									0, 0, 1, 0,
 									0, 0, 0, 1);
 
-	projMatrix = glm::perspectiveFov<pvr::float32>(fovy, this->getWidth(), this->getHeight(), near, far);
+	projMatrix = pvr::math::perspectiveFov(getPlatformContext().getApiType(), fovy, this->getWidth(), this->getHeight(), near, far);
 
 	viewMatrix = glm::lookAt(from, to, up);
 
