@@ -56,7 +56,7 @@ bool MyDemo::configureUbo()
 	apiObject->ubo.addEntryPacked("MVPMatrix", pvr::types::GpuDatatypes::mat4x4);
 	for (int i = 0; i < getPlatformContext().getSwapChainLength(); ++i) {
 		pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, 0);
-		pvr::api::BufferView uboBufferView = context->createBufferView(uboBuffer, 0, uboBuffer->getSize());
+		pvr::api::BufferView uboBufferView = context->createBufferView(uboBuffer, 0, apiObject->ubo.getAlignedElementSize());
 		apiObject->ubo.connectWithBuffer(i, uboBufferView, pvr::types::BufferViewTypes::UniformBuffer, pvr::types::MapBufferFlags::Write, 0);
 		apiObject->uboDescSet[i] = context->createDescriptorSetOnDefaultPool(apiObject->uboDescSetLayout);
 		descSetUpdate.setUbo(0, apiObject->ubo.getConnectedBuffer(i));
@@ -239,11 +239,11 @@ pvr::Result MyDemo::renderFrame()
 	angleY = (glm::pi<pvr::float32>() / 150) * 0.05f * this->getFrameTime();
 	modelMatrix = glm::rotate(angleY, glm::vec3(0.0f, 1.0f, 0.0f));
 	mvp = mvp * modelMatrix;
-	apiObject->ubo.map(context->getSwapChainIndex(), pvr::types::MapBufferFlags::Write, 0);
+	apiObject->ubo.map(context->getSwapChainIndex());
 	apiObject->ubo.setValue(0, mvp);
 	apiObject->ubo.unmap(context->getSwapChainIndex());
 
-	apiObject->commandBuffer[context->getSwapChainIndex()]->submit();
+	apiObject->commandBuffer[getPlatformContext().getSwapChainIndex()]->submit();
 
 	return pvr::Result::Success;
 }
