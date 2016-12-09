@@ -175,11 +175,16 @@ pvr::Result MyDemo::initApplication()
 
 pvr::Result MyDemo::initView()
 {
-	apiObject.reset(new ApiObject());
 	context = getGraphicsContext();
-
+	apiObject.reset(new ApiObject());
+	
 	pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos);
 
+
+	if (!configureFbo())
+	{
+		return pvr::Result::UnknownError;
+	}
 	if (!configureGraphicsPipeline())
 	{
 		return pvr::Result::UnknownError;
