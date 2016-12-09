@@ -178,12 +178,6 @@ pvr::Result MyDemo::initView()
 	apiObject.reset(new ApiObject());
 	context = getGraphicsContext();
 
-	apiObject->commandBuffer.resize(getSwapChainLength());
-	for (int i = 0; i < context->getSwapChainLength(); ++i)
-	{
-		apiObject->commandBuffer[i] = context->createCommandBufferOnDefaultPool();
-	}
-
 	pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos);
 
 	if (!configureGraphicsPipeline())
@@ -208,9 +202,9 @@ pvr::Result MyDemo::initView()
 	fovy = glm::pi<pvr::float32>() / 2;
 
 	glm::mat4 modelMatrix = glm::mat4(1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1);
+									0, 1, 0, 0,
+									0, 0, 1, 0,
+									0, 0, 0, 1);
 
 	projMatrix = glm::perspectiveFov<pvr::float32>(fovy, this->getWidth(), this->getHeight(), near, far);
 
