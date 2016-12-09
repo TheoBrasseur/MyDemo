@@ -2,7 +2,6 @@
 #include <PVRApi/PVRApi.h>
 #include <PVREngineUtils/PVREngineUtils.h>
 
-
 const char * modelFilename = "teapot.pod";
 const char * textureFileName = "Marble.pvr";
 const char * vertexShaderFile = "VertShader_vk.vsh";
@@ -66,7 +65,6 @@ bool MyDemo::configureUbo()
 
 	return true;
 }
-
 
 bool MyDemo::configureCommandBuffer()
 {
