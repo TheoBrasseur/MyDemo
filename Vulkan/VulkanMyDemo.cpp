@@ -35,7 +35,7 @@ class MyDemo : public pvr::Shell
 	pvr::assets::ModelHandle modelHandle;
 	std::auto_ptr<ApiObject> apiObject;
 
-	pvr::Result drawMesh(int nodeIndex, int swapChainIndex);
+	pvr::Result drawMesh(int nodeIndex, pvr::api::CommandBuffer);
 	bool configureUbo();
 	bool configureFbo();
 	bool configureGraphicsPipeline();
@@ -53,8 +53,8 @@ bool MyDemo::configureUbo()
 {
 	pvr::api::DescriptorSetUpdate descSetUpdate;
 	apiObject->uboDescSet.resize(context->getSwapChainLength());
-	for (int i = 0; i < context->getSwapChainLength(); ++i) {
-		apiObject->ubo.addEntryPacked("MVPMatrix", pvr::types::GpuDatatypes::mat4x4, i);
+	apiObject->ubo.addEntryPacked("MVPMatrix", pvr::types::GpuDatatypes::mat4x4);
+	for (int i = 0; i < getPlatformContext().getSwapChainLength(); ++i) {
 		pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, 0);
 		pvr::api::BufferView uboBufferView = context->createBufferView(uboBuffer, 0, uboBuffer->getSize());
 		apiObject->ubo.connectWithBuffer(i, uboBufferView, pvr::types::BufferViewTypes::UniformBuffer, pvr::types::MapBufferFlags::Write, 0);
@@ -68,28 +68,31 @@ bool MyDemo::configureUbo()
 
 bool MyDemo::configureCommandBuffer()
 {
-	for (pvr::uint32 i = 0; i < context->getSwapChainLength(); i++)
+	apiObject->commandBuffer.resize(getPlatformContext().getSwapChainLength());
+	for (pvr::uint32 i = 0; i < context->getSwapChainLength(); ++i)
 	{
-		apiObject->commandBuffer[i]->beginRecording();
-		apiObject->commandBuffer[i]->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
-		apiObject->commandBuffer[i]->bindPipeline(apiObject->graphicsPipeline);
-		apiObject->commandBuffer[i]->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->uboDescSet[i]);
-		drawMesh(0, i);
+		apiObject->commandBuffer[i] = context->createCommandBufferOnDefaultPool();
+		pvr::api::CommandBuffer commandBuffer = apiObject->commandBuffer[i];
+		commandBuffer->beginRecording();
+		commandBuffer->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
+		commandBuffer->bindPipeline(apiObject->graphicsPipeline);
+		commandBuffer->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->uboDescSet[i]);
+		drawMesh(0, commandBuffer);
 		pvr::api::SecondaryCommandBuffer uiCmdBuffer = context->createSecondaryCommandBufferOnDefaultPool();
-		apiObject->commandBuffer[i]->endRenderPass();
-		apiObject->commandBuffer[i]->endRecording();
+		commandBuffer->endRenderPass();
+		commandBuffer->endRecording();
 	}
 
 	return true;
 }
 
-pvr::Result MyDemo::drawMesh(int nodeIndex, int swapChainIndex)
+pvr::Result MyDemo::drawMesh(int nodeIndex, pvr::api::CommandBuffer commandBuffer)
 {
 	pvr::uint32 meshId = modelHandle->getNode(nodeIndex).getObjectId();
 	pvr::assets::Mesh& mesh = modelHandle->getMesh(meshId);
 
-	apiObject->commandBuffer[swapChainIndex]->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
-	apiObject->commandBuffer[swapChainIndex]->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
+	commandBuffer->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
+	commandBuffer->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
 
 	if (mesh.getNumStrips() != 0)
 	{
@@ -100,17 +103,11 @@ pvr::Result MyDemo::drawMesh(int nodeIndex, int swapChainIndex)
 	{
 		if (apiObject->ibos[meshId].isValid())
 		{
-			for (pvr::uint16 i = 0; i < context->getSwapChainLength(); i++)
-			{
-				apiObject->commandBuffer[swapChainIndex]->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
-			}
+			commandBuffer->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
 		}
 		else
 		{
-			for (pvr::uint16 i = 0; i < context->getSwapChainLength(); i++)
-			{
-				apiObject->commandBuffer[swapChainIndex]->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
-			}
+			commandBuffer->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
 		}
 	}
 
