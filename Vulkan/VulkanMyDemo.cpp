@@ -4,13 +4,8 @@
 
 const char * modelFilename = "teapot.pod";
 const char * textureFileName = "Marble.pvr";
-<<<<<<< HEAD
 const char * vertexShaderFile = "VertShader_vk.spv";
 const char * fragShaderFile = "FragShader_vk.spv";
-=======
-const char * vertexShaderFile = "VertShader_vk.vsh";
-const char * fragShaderFile = "FragShader_vk.fsh";
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 
 pvr::float32 angleY = glm::pi<pvr::float32>() / 16;
 pvr::utils::VertexBindings_Name vertexBinding_Names[] = { {"POSITION", "inPositions"} };
@@ -35,58 +30,33 @@ class MyDemo : public pvr::Shell
 	glm::mat4 projMatrix;
 	glm::mat4 mvp;
 
-<<<<<<< HEAD
 	pvr::utils::AssetStore assetStore;
 	pvr::GraphicsContext context;
 	pvr::assets::ModelHandle modelHandle;
 	std::auto_ptr<ApiObject> apiObject;
 
 	pvr::Result drawMesh(int nodeIndex, pvr::api::CommandBuffer);
-=======
-	pvr::GraphicsContext context;
-	pvr::utils::AssetStore assetStore;
-	pvr::assets::ModelHandle modelHandle;
-	std::auto_ptr<ApiObject> apiObject;
-	pvr::ui::UIRenderer uiRenderer;
-
-	pvr::Result drawMesh(int nodeIndex, int swapChainIndex);
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 	bool configureUbo();
 	bool configureFbo();
 	bool configureGraphicsPipeline();
 	bool configureCommandBuffer();
 
 public:
-<<<<<<< HEAD
-virtual pvr::Result initApplication();
-virtual pvr::Result initView();
-virtual pvr::Result quitApplication();
-virtual pvr::Result renderFrame();
-virtual pvr::Result releaseView();
-=======
-	virtual pvr::Result initApplication();
+  virtual pvr::Result quitApplication();
 	virtual pvr::Result initView();
-	virtual pvr::Result quitApplication();
+  virtual pvr::Result initApplication();
 	virtual pvr::Result renderFrame();
 	virtual pvr::Result releaseView();
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 };
 
 bool MyDemo::configureUbo()
 {
 	pvr::api::DescriptorSetUpdate descSetUpdate;
 	apiObject->uboDescSet.resize(context->getSwapChainLength());
-<<<<<<< HEAD
-	apiObject->ubo.addEntryPacked("MVPMatrix", pvr::types::GpuDatatypes::mat4x4);
-	for (int i = 0; i < getPlatformContext().getSwapChainLength(); ++i) {
-		pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, true);
-		pvr::api::BufferView uboBufferView = context->createBufferView(uboBuffer, 0, apiObject->ubo.getAlignedElementSize());
-=======
 	for (int i = 0; i < context->getSwapChainLength(); ++i) {
 		apiObject->ubo.addEntryPacked("MVPMatrix", pvr::types::GpuDatatypes::mat4x4, i);
 		pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, true);
 		pvr::api::BufferView uboBufferView = context->createBufferView(uboBuffer, 0, uboBuffer->getSize());
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 		apiObject->ubo.connectWithBuffer(i, uboBufferView, pvr::types::BufferViewTypes::UniformBuffer, pvr::types::MapBufferFlags::Write, 0);
 		apiObject->uboDescSet[i] = context->createDescriptorSetOnDefaultPool(apiObject->uboDescSetLayout);
 		descSetUpdate.setUbo(0, apiObject->ubo.getConnectedBuffer(i));
@@ -96,7 +66,6 @@ bool MyDemo::configureUbo()
 	return true;
 }
 
-<<<<<<< HEAD
 bool MyDemo::configureCommandBuffer()
 {
 	apiObject->commandBuffer.resize(getPlatformContext().getSwapChainLength());
@@ -112,48 +81,19 @@ bool MyDemo::configureCommandBuffer()
 		drawMesh(0, commandBuffer);
 		commandBuffer->endRenderPass();
 		commandBuffer->endRecording();
-=======
 
-bool MyDemo::configureCommandBuffer()
-{
-	for (pvr::uint32 i = 0; i < context->getSwapChainLength(); i++)
-	{
-		apiObject->commandBuffer[i]->beginRecording();
-		apiObject->commandBuffer[i]->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), true, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
-		apiObject->commandBuffer[i]->bindPipeline(apiObject->graphicsPipeline);
-		apiObject->commandBuffer[i]->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->uboDescSet[i]);
-		drawMesh(0, i);
-		pvr::api::SecondaryCommandBuffer uiCmdBuffer = context->createSecondaryCommandBufferOnDefaultPool();
-		uiRenderer.beginRendering(uiCmdBuffer);
-		uiRenderer.getDefaultTitle()->render();
-		uiRenderer.getSdkLogo()->render();
-		apiObject->commandBuffer[i]->enqueueSecondaryCmds(uiCmdBuffer);
-		uiRenderer.endRendering();
-		apiObject->commandBuffer[i]->endRenderPass();
-		apiObject->commandBuffer[i]->endRecording();
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 	}
 
 	return true;
 }
 
-<<<<<<< HEAD
 pvr::Result MyDemo::drawMesh(int nodeIndex, pvr::api::CommandBuffer commandBuffer)
-=======
-pvr::Result MyDemo::drawMesh(int nodeIndex, int swapChainIndex)
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 {
 	pvr::uint32 meshId = modelHandle->getNode(nodeIndex).getObjectId();
 	pvr::assets::Mesh& mesh = modelHandle->getMesh(meshId);
 
-<<<<<<< HEAD
 	commandBuffer->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
 	
-=======
-	apiObject->commandBuffer[swapChainIndex]->bindVertexBuffer(apiObject->vbos[meshId], 0, 0);
-	apiObject->commandBuffer[swapChainIndex]->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
-
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 	if (mesh.getNumStrips() != 0)
 	{
 		pvr::Log(pvr::Log.Error, "Model is not a triangle list");
@@ -163,26 +103,12 @@ pvr::Result MyDemo::drawMesh(int nodeIndex, int swapChainIndex)
 	{
 		if (apiObject->ibos[meshId].isValid())
 		{
-<<<<<<< HEAD
 			commandBuffer->bindIndexBuffer(apiObject->ibos[meshId], 0, mesh.getFaces().getDataType());
 			commandBuffer->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
 		}
 		else
 		{
 			commandBuffer->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
-=======
-			for (pvr::uint16 i = 0; i < context->getSwapChainLength(); i++)
-			{
-				apiObject->commandBuffer[swapChainIndex]->drawIndexed(0, mesh.getNumFaces() * 3, 0, 0, 1);
-			}
-		}
-		else
-		{
-			for (pvr::uint16 i = 0; i < context->getSwapChainLength(); i++)
-			{
-				apiObject->commandBuffer[swapChainIndex]->drawArrays(0, mesh.getNumFaces() * 3, 0, 1);
-			}
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 		}
 	}
 
@@ -191,10 +117,6 @@ pvr::Result MyDemo::drawMesh(int nodeIndex, int swapChainIndex)
 
 bool MyDemo::configureFbo()
 {
-<<<<<<< HEAD
-=======
-	apiObject->fbos.resize(context->getSwapChainLength());
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 	apiObject->fbos = context->createOnScreenFboSet();
 
 	return true;
@@ -204,7 +126,6 @@ bool MyDemo::configureGraphicsPipeline()
 {
 	pvr::api::GraphicsPipelineCreateParam pipelineInfo;
 	pvr::types::BlendingConfig colorBlendState;
-<<<<<<< HEAD
 	
 	colorBlendState.blendEnable = false;
 	pipelineInfo.colorBlend.setAttachmentState(0, colorBlendState);
@@ -230,55 +151,18 @@ bool MyDemo::configureGraphicsPipeline()
 	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());
 	pipelineInfo.rasterizer.setCullFace(pvr::types::Face::Back);
 	pipelineInfo.renderPass = apiObject->fbos[0]->getRenderPass();
-=======
-	colorBlendState.blendEnable = false;
-
-	pvr::assets::ShaderFile shaderFile;
-
-	pvr::api::DescriptorSetLayoutCreateParam descSetLayoutInfo;
-	descSetLayoutInfo.setBinding(0, pvr::types::DescriptorType::UniformBufferDynamic, 1, pvr::types::ShaderStageFlags::AllGraphicsStages);
-
-	apiObject->uboDescSetLayout = context->createDescriptorSetLayout(descSetLayoutInfo);
-
-	pipelineInfo.colorBlend.setAttachmentState(0, colorBlendState);
-
-	pvr::api::PipelineLayoutCreateParam pipelineLayoutInfo;
-	pipelineLayoutInfo.addDescSetLayout(apiObject->uboDescSetLayout);
-
-	// Until fixed
-	//shaderFile.populateValidVersions(vertexShaderFile, *this);
-	
-	//shaderFile.populateValidVersions(fragShaderFile, *this);
-	//pipelineInfo.fragmentShader = context->createShader(*shaderFile.getBestStreamForContext(context), pvr::types::ShaderType::FragmentShader);
-
-	pipelineInfo.vertexShader = context->createShader(*this->getAssetStream(vertexShaderFile), pvr::types::ShaderType::VertexShader);
-	pipelineInfo.fragmentShader = context->createShader(*this->getAssetStream(fragShaderFile), pvr::types::ShaderType::FragmentShader);
-
-	pvr::assets::Mesh mesh = modelHandle->getMesh(0);
-	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());
-	pipelineInfo.inputAssembler.setPrimitiveTopology(pvr::types::PrimitiveTopology::TriangleList);
-	apiObject->pipelineLayout = context->createPipelineLayout(pipelineLayoutInfo);
-	pipelineInfo.rasterizer.setCullFace(pvr::types::Face::Back);
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 	pipelineInfo.depthStencil.setDepthTestEnable(true).setDepthCompareFunc(pvr::types::ComparisonMode::Less).setDepthWrite(true);
 	pvr::utils::createInputAssemblyFromMesh(mesh, vertexBinding_Names, sizeof(vertexBinding_Names) / sizeof(vertexBinding_Names[0]), pipelineInfo);
 
 	apiObject->graphicsPipeline = context->createGraphicsPipeline(pipelineInfo);
 
-<<<<<<< HEAD
 	return (apiObject->graphicsPipeline.isValid());
-=======
-	return true;
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 }
 
 pvr::Result MyDemo::initApplication()
 {
 	assetStore.init(*this);
-<<<<<<< HEAD
-=======
 	int numNode;
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 
 	// Load model
 	if (!assetStore.loadModel(modelFilename, modelHandle, false))
@@ -291,7 +175,6 @@ pvr::Result MyDemo::initApplication()
 
 pvr::Result MyDemo::initView()
 {
-<<<<<<< HEAD
 	context = getGraphicsContext();
 	apiObject.reset(new ApiObject());
 	
@@ -306,35 +189,12 @@ pvr::Result MyDemo::initView()
 	if (!configureGraphicsPipeline())
 	{
 		setExitMessage("Failed to create graphics pipeline");
-=======
-	apiObject.reset(new ApiObject());
-	context = getGraphicsContext();
-
-	apiObject->commandBuffer.resize(getSwapChainLength());
-	for (int i = 0; i < context->getSwapChainLength(); ++i)
-	{
-		apiObject->commandBuffer[i] = context->createCommandBufferOnDefaultPool();
-	}
-
-	pvr::utils::appendSingleBuffersFromModel(getGraphicsContext(), *modelHandle, apiObject->vbos, apiObject->ibos);
-
-	if (!configureGraphicsPipeline())
-	{
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 		return pvr::Result::UnknownError;
 	}
 
 	if (!configureUbo())
 	{
-<<<<<<< HEAD
 		setExitMessage("Failed to create UBO");
-=======
-		return pvr::Result::UnknownError;
-	}
-
-	if (uiRenderer.init(apiObject->fbos[context->getSwapChainIndex()]->getRenderPass(), 0) != pvr::Result::Success)
-	{
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 		return pvr::Result::UnknownError;
 	}
 
@@ -350,19 +210,11 @@ pvr::Result MyDemo::initView()
 	fovy = glm::pi<pvr::float32>() / 2;
 
 	glm::mat4 modelMatrix = glm::mat4(1, 0, 0, 0,
-<<<<<<< HEAD
 									0, 1, 0, 0,
 									0, 0, 1, 0,
 									0, 0, 0, 1);
 
 	projMatrix = pvr::math::perspectiveFov(getPlatformContext().getApiType(), fovy, this->getWidth(), this->getHeight(), near, far);
-=======
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1);
-
-	projMatrix = glm::perspectiveFov<pvr::float32>(fovy, this->getWidth(), this->getHeight(), near, far);
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 
 	viewMatrix = glm::lookAt(from, to, up);
 
@@ -379,10 +231,6 @@ pvr::Result MyDemo::initView()
 pvr::Result MyDemo::releaseView()
 {
 	apiObject.reset();
-<<<<<<< HEAD
-=======
-	uiRenderer.release();
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 	modelHandle.reset();
 	assetStore.releaseAll();
 	return pvr::Result::Success;
@@ -393,19 +241,11 @@ pvr::Result MyDemo::renderFrame()
 	angleY = (glm::pi<pvr::float32>() / 150) * 0.05f * this->getFrameTime();
 	modelMatrix = glm::rotate(angleY, glm::vec3(0.0f, 1.0f, 0.0f));
 	mvp = mvp * modelMatrix;
-<<<<<<< HEAD
 	apiObject->ubo.map(context->getSwapChainIndex());
 	apiObject->ubo.setValue(0, mvp);
 	apiObject->ubo.unmap(context->getSwapChainIndex());
 
 	apiObject->commandBuffer[getPlatformContext().getSwapChainIndex()]->submit();
-=======
-	apiObject->ubo.map(context->getSwapChainIndex(), pvr::types::MapBufferFlags::Write, 0);
-	apiObject->ubo.setValue(0, mvp);
-	apiObject->ubo.unmap(context->getSwapChainIndex());
-
-	apiObject->commandBuffer[context->getSwapChainIndex()]->submit();
->>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
 
 	return pvr::Result::Success;
 }
