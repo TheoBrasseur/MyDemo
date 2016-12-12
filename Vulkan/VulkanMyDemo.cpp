@@ -31,7 +31,7 @@ class MyDemo : public pvr::Shell
 	glm::mat4 mvp;
 
 	pvr::GraphicsContext context;
-	pvr::api::AssetStore assetStore;
+	pvr::utils::AssetStore assetStore;
 	pvr::assets::ModelHandle modelHandle;
 	std::auto_ptr<ApiObject> apiObject;
 	pvr::ui::UIRenderer uiRenderer;
@@ -56,7 +56,7 @@ bool MyDemo::configureUbo()
 	apiObject->uboDescSet.resize(context->getSwapChainLength());
 	for (int i = 0; i < context->getSwapChainLength(); ++i) {
 		apiObject->ubo.addEntryPacked("MVPMatrix", pvr::types::GpuDatatypes::mat4x4, i);
-		pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, 0);
+		pvr::api::Buffer uboBuffer = context->createBuffer(apiObject->ubo.getAlignedTotalSize(), pvr::types::BufferBindingUse::UniformBuffer, true);
 		pvr::api::BufferView uboBufferView = context->createBufferView(uboBuffer, 0, uboBuffer->getSize());
 		apiObject->ubo.connectWithBuffer(i, uboBufferView, pvr::types::BufferViewTypes::UniformBuffer, pvr::types::MapBufferFlags::Write, 0);
 		apiObject->uboDescSet[i] = context->createDescriptorSetOnDefaultPool(apiObject->uboDescSetLayout);
@@ -73,7 +73,7 @@ bool MyDemo::configureCommandBuffer()
 	for (pvr::uint32 i = 0; i < context->getSwapChainLength(); i++)
 	{
 		apiObject->commandBuffer[i]->beginRecording();
-		apiObject->commandBuffer[i]->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), false, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
+		apiObject->commandBuffer[i]->beginRenderPass(apiObject->fbos[i], apiObject->renderPass, pvr::Rectanglei(0, 0, getWidth(), getHeight()), true, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), 1.f, 0);
 		apiObject->commandBuffer[i]->bindPipeline(apiObject->graphicsPipeline);
 		apiObject->commandBuffer[i]->bindDescriptorSet(apiObject->pipelineLayout, 0, apiObject->uboDescSet[i]);
 		drawMesh(0, i);
@@ -150,11 +150,14 @@ bool MyDemo::configureGraphicsPipeline()
 	pvr::api::PipelineLayoutCreateParam pipelineLayoutInfo;
 	pipelineLayoutInfo.addDescSetLayout(apiObject->uboDescSetLayout);
 
-	shaderFile.populateValidVersions(vertexShaderFile, *this);
-	pipelineInfo.vertexShader = context->createShader(*shaderFile.getBestStreamForContext(context), pvr::types::ShaderType::VertexShader);
+	// Until fixed
+	//shaderFile.populateValidVersions(vertexShaderFile, *this);
+	
+	//shaderFile.populateValidVersions(fragShaderFile, *this);
+	//pipelineInfo.fragmentShader = context->createShader(*shaderFile.getBestStreamForContext(context), pvr::types::ShaderType::FragmentShader);
 
-	shaderFile.populateValidVersions(fragShaderFile, *this);
-	pipelineInfo.fragmentShader = context->createShader(*shaderFile.getBestStreamForContext(context), pvr::types::ShaderType::FragmentShader);
+	pipelineInfo.vertexShader = context->createShader(*this->getAssetStream(vertexShaderFile), pvr::types::ShaderType::VertexShader);
+	pipelineInfo.fragmentShader = context->createShader(*this->getAssetStream(fragShaderFile), pvr::types::ShaderType::FragmentShader);
 
 	pvr::assets::Mesh mesh = modelHandle->getMesh(0);
 	pipelineInfo.inputAssembler.setPrimitiveTopology(mesh.getPrimitiveType());
