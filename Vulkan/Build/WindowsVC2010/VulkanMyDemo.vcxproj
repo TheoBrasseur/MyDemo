@@ -21,7 +21,11 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1A52CC6C-2E29-428E-AEB6-29C572545CF1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
+<<<<<<< HEAD
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+=======
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+>>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -37,12 +41,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
+<<<<<<< HEAD
     <PlatformToolset>v140</PlatformToolset>
+=======
+    <PlatformToolset>v120</PlatformToolset>
+>>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+<<<<<<< HEAD
     <PlatformToolset>v140</PlatformToolset>
+=======
+    <PlatformToolset>v120</PlatformToolset>
+>>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -109,9 +121,14 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
+<<<<<<< HEAD
       <AdditionalDependencies>PVRCore.lib;PVRAssets.lib;PVRVulkanGlue.lib;PVRNativeVulkan.lib;PVRVulkan.lib;PVRShell.lib;PVREngineUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\..\..\..\Framework\Bin\WindowsVC2010\$(Configuration)_$(PlatformArchitecture);</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
+=======
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\Framework\Bin\WindowsVC2010\$(Configuration)_$(PlatformArchitecture);</AdditionalLibraryDirectories>
+      <AdditionalDependencies>PVRCore.lib;PVRAssets.lib;PVRVulkanGlue.lib;PVRNativeVulkan.lib;PVRVulkan.lib;PVRShell.lib;PVREngineUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+>>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -120,9 +137,14 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
+<<<<<<< HEAD
       <AdditionalDependencies>PVRCore.lib;PVRAssets.lib;PVRVulkanGlue.lib;PVRNativeVulkan.lib;PVRVulkan.lib;PVRShell.lib;PVREngineUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\..\..\..\Framework\Bin\WindowsVC2010\$(Configuration)_$(PlatformArchitecture);</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
+=======
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\Framework\Bin\WindowsVC2010\$(Configuration)_$(PlatformArchitecture);</AdditionalLibraryDirectories>
+      <AdditionalDependencies>PVRCore.lib;PVRAssets.lib;PVRVulkanGlue.lib;PVRNativeVulkan.lib;PVRVulkan.lib;PVRShell.lib;PVREngineUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+>>>>>>> 0db5ac3ba1217b05d46a9dc0c88fbeea0a244fb3
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
